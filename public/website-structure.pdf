@@ -1,0 +1,66 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 4 0 R >> >> /MediaBox [0 0 612 792] /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 1506 >>
+stream
+BT /F1 10 Tf 14 TL 40 750 Td
+(RoomShare Platform - Architecture & Structure Blueprint) '
+(=======================================================) '
+() '
+(1. Executive Platform Summary) '
+(RoomShare is a modern, high-performance web platform for residential room and house rentals in Ghana.) '
+(It supports dual-role access control for Landlords and Tenants.) '
+(Key capabilities: listing management, verified room discovery, direct messaging, end-to-end lease workflow.) '
+() '
+(2. Technology Stack) '
+(- Frontend: React 19 + TypeScript + Vite 6) '
+(- Styling: Tailwind CSS v4) '
+(- Iconography & Motion: Lucide React icons + Framer Motion) '
+(- Backend: Express.js on Node.js \(Port 3000\)) '
+(- Persistence: Server-side JSON DB \(data/db.json\) + local client sync) '
+(- Image Optimizer: Canvas-based client downscaling to ~1400px) '
+() '
+(3. System Components & Routes) '
+(- Room Discovery & Filter Engine \(App.tsx & FilterBar.tsx\)) '
+(- Room Details Modal \(RoomDetailModal.tsx\)) '
+(- Landlord Dashboard & Listing Wizard \(LandlordDashboard.tsx\)) '
+(- Tenant Hub & Tracker \(TenantApplicationsView.tsx\)) '
+(- Real-Time Inbox \(MessagesView.tsx\)) '
+(- Lease Application Modal \(ApplicationModal.tsx\)) '
+() '
+(4. REST API Endpoints) '
+(- GET /api/data) '
+(- POST /api/sync) '
+(- GET / POST / PUT / DELETE /api/rooms) '
+(- GET / POST / PUT /api/users) '
+(- GET / POST / PUT /api/applications) '
+(- GET / POST /api/conversations) '
+(- GET / POST /api/messages) '
+(- GET /website-structure.pdf) '
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1869
+%%EOF

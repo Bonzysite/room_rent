@@ -1,0 +1,375 @@
+{
+  "users": [
+    {
+      "id": "user-landlord-1",
+      "name": "Kwame Mensah",
+      "email": "kwame.mensah@roomshare.gh",
+      "role": "landlord",
+      "phone": "+233 24 412 8990",
+      "bio": "Certified property manager with 8+ years hosting corporate expats, healthcare professionals, and postgraduate scholars in Accra.",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      "createdAt": "2026-01-10T09:00:00.000Z"
+    },
+    {
+      "id": "user-landlord-2",
+      "name": "Akosua Osei",
+      "email": "akosua.osei@roomshare.gh",
+      "role": "landlord",
+      "phone": "+233 20 891 3321",
+      "bio": "Interior designer & property host offering serene, secure flats in Cantonments and Labone.",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+      "createdAt": "2026-01-15T10:30:00.000Z"
+    },
+    {
+      "id": "user-tenant-1",
+      "name": "Emmanuel Owusu",
+      "email": "emmanuel.owusu@techaccra.com",
+      "role": "tenant",
+      "phone": "+233 55 123 4567",
+      "bio": "Software Engineer working remotely for a fintech firm. Looking for a quiet, reliable self-contained room or flat with generator backup.",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      "createdAt": "2026-02-01T12:00:00.000Z"
+    },
+    {
+      "id": "user-tenant-2",
+      "name": "Naa Dzama Addo",
+      "email": "naa.addo@korlebu.org",
+      "role": "tenant",
+      "phone": "+233 27 765 4321",
+      "bio": "Medical Resident in Korle-Bu / Ridge Hospital. Non-smoker, clean, early riser.",
+      "avatar": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=400&q=80",
+      "createdAt": "2026-02-14T14:20:00.000Z"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "room-1",
+      "landlordId": "user-landlord-1",
+      "landlordName": "Kwame Mensah",
+      "landlordEmail": "kwame.mensah@roomshare.gh",
+      "title": "Luxury Self-Contained Studio with Standby Plant & Fiber Internet",
+      "description": "Exquisite modern studio located in the prime embassy zone of East Legon (near American House). Fully air-conditioned, dedicated prepaid meter, continuous water supply with 5,000L poly tank backup, and automatic standby generator for seamless remote work.",
+      "price": 3200,
+      "deposit": 3200,
+      "roomType": "Self-Contained",
+      "city": "Accra",
+      "neighborhood": "East Legon",
+      "address": "Boundary Road, near American House, East Legon",
+      "images": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "amenities": [
+        "Air Conditioning",
+        "Standby Generator",
+        "Poly Tank Reservoir",
+        "Wi-Fi",
+        "24/7 Security",
+        "Furnished",
+        "Parking",
+        "Kitchen Access"
+      ],
+      "billsIncluded": true,
+      "availableDate": "2026-10-01",
+      "minLeaseMonths": 12,
+      "rules": [
+        "No indoor smoking",
+        "Quiet hours after 10:00 PM",
+        "Guest stays exceeding 3 nights must be pre-notified",
+        "No pets"
+      ],
+      "status": "paused",
+      "createdAt": "2026-02-15T08:00:00.000Z"
+    },
+    {
+      "id": "room-2",
+      "landlordId": "user-landlord-2",
+      "landlordName": "Akosua Osei",
+      "landlordEmail": "akosua.osei@roomshare.gh",
+      "title": "Master Bedroom En-Suite in Modern Diplomatic Enclave Flat",
+      "description": "Spacious, sunlit master bedroom with private en-suite bathroom, walk-in closet, and balcony access inside a contemporary 3-bedroom luxury flat in Cantonments. Shared gourmet kitchen, pool access, and gated perimeter with biometric guard access.",
+      "price": 4500,
+      "deposit": 4500,
+      "roomType": "Master Bedroom",
+      "city": "Accra",
+      "neighborhood": "Cantonments",
+      "address": "4th Circular Road, Cantonments",
+      "images": [
+        "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "amenities": [
+        "Air Conditioning",
+        "Standby Generator",
+        "Poly Tank Reservoir",
+        "Wi-Fi",
+        "24/7 Security",
+        "Furnished",
+        "Parking",
+        "Laundry",
+        "Kitchen Access"
+      ],
+      "billsIncluded": false,
+      "availableDate": "2026-10-15",
+      "minLeaseMonths": 6,
+      "rules": [
+        "Working professionals preferred",
+        "Shared kitchen cleaning roster",
+        "No loud parties inside common areas"
+      ],
+      "status": "active",
+      "createdAt": "2026-02-18T11:30:00.000Z"
+    },
+    {
+      "id": "room-3",
+      "landlordId": "user-landlord-1",
+      "landlordName": "Kwame Mensah",
+      "landlordEmail": "kwame.mensah@roomshare.gh",
+      "title": "Cozy Single Room for Student or Young Graduate near KNUST",
+      "description": "Tiled, airy private single room situated in Ayeduase, just 5 minutes walk from KNUST campus gate. High speed internet, shared modern kitchenette and bathroom, secure walled compound with CCTV.",
+      "price": 850,
+      "deposit": 850,
+      "roomType": "Single Room",
+      "city": "Kumasi",
+      "neighborhood": "Ayeduase (KNUST)",
+      "address": "Near Tech Junction, Ayeduase, Kumasi",
+      "images": [
+        "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "amenities": [
+        "Wi-Fi",
+        "Poly Tank Reservoir",
+        "24/7 Security",
+        "Kitchen Access"
+      ],
+      "billsIncluded": true,
+      "availableDate": "2026-09-30",
+      "minLeaseMonths": 12,
+      "rules": [
+        "Student ID or employment letter required",
+        "Strictly no smoking",
+        "Quiet study atmosphere"
+      ],
+      "status": "paused",
+      "createdAt": "2026-02-20T16:00:00.000Z"
+    },
+    {
+      "id": "room-4",
+      "landlordId": "user-landlord-2",
+      "landlordName": "Akosua Osei",
+      "landlordEmail": "akosua.osei@roomshare.gh",
+      "title": "Entire 2-Bedroom Serviced Apartment in Vibrant Osu",
+      "description": "Stylish 2-bedroom executive apartment directly off Oxford Street, Osu. Walk to top cafes, art galleries, and restaurants. Features high ceiling, private balcony, Smart TVs, backup plant, and dedicated car parking bay.",
+      "price": 7500,
+      "deposit": 7500,
+      "roomType": "Entire Apartment",
+      "city": "Accra",
+      "neighborhood": "Osu (Oxford Street)",
+      "address": "Lokko Road, Osu, Accra",
+      "images": [
+        "https://images.unsplash.com/photo-1502005229762-ee1b2b814a0f?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "amenities": [
+        "Air Conditioning",
+        "Standby Generator",
+        "Poly Tank Reservoir",
+        "Wi-Fi",
+        "24/7 Security",
+        "Furnished",
+        "Parking",
+        "Laundry",
+        "Kitchen Access"
+      ],
+      "billsIncluded": false,
+      "availableDate": "2026-10-01",
+      "minLeaseMonths": 6,
+      "rules": [
+        "Quiet hours after 11 PM on weekdays",
+        "Small pets allowed upon review"
+      ],
+      "status": "active",
+      "createdAt": "2026-02-22T14:10:00.000Z"
+    },
+    {
+      "id": "room-5",
+      "landlordId": "user-landlord-1",
+      "landlordName": "Kwame Mensah",
+      "landlordEmail": "kwame.mensah@roomshare.gh",
+      "title": "Modern Studio in Airport Residential Area",
+      "description": "Compact luxury studio ideal for flight crew, consultants, or corporate executives. 4 minutes from Kotoka International Airport. Features elevator, swimming pool, gym access, 100% backup power and hotel-grade water filtration.",
+      "price": 5200,
+      "deposit": 5200,
+      "roomType": "Studio",
+      "city": "Accra",
+      "neighborhood": "Airport Residential",
+      "address": "Senchi Street, Airport Residential, Accra",
+      "images": [
+        "https://images.unsplash.com/photo-1536376072261-38c75010e6c9?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "amenities": [
+        "Air Conditioning",
+        "Standby Generator",
+        "Poly Tank Reservoir",
+        "Wi-Fi",
+        "24/7 Security",
+        "Furnished",
+        "Parking",
+        "Kitchen Access"
+      ],
+      "billsIncluded": true,
+      "availableDate": "2026-11-01",
+      "minLeaseMonths": 12,
+      "rules": [
+        "No smoking inside the unit",
+        "Building pool rules apply"
+      ],
+      "status": "active",
+      "createdAt": "2026-02-25T17:45:00.000Z"
+    },
+    {
+      "id": "room-6",
+      "landlordId": "user-landlord-2",
+      "landlordName": "Akosua Osei",
+      "landlordEmail": "akosua.osei@roomshare.gh",
+      "title": "Shared Master Bedroom in Spintex (Coastal Estate)",
+      "description": "Two-person room sharing opportunity for young working ladies in a secure, paved community along Spintex Road. Close to Shell sign board and Palace Mall. Clean tiled room with individual wardrobes and shared en-suite washroom.",
+      "price": 600,
+      "deposit": 600,
+      "roomType": "Shared Room",
+      "city": "Accra",
+      "neighborhood": "Spintex",
+      "address": "Coastal Estate, Spintex Road, Accra",
+      "images": [
+        "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "amenities": [
+        "Poly Tank Reservoir",
+        "24/7 Security",
+        "Kitchen Access",
+        "Parking"
+      ],
+      "billsIncluded": true,
+      "availableDate": "2026-10-01",
+      "minLeaseMonths": 6,
+      "rules": [
+        "Female tenants only",
+        "Keep common spaces tidy"
+      ],
+      "status": "active",
+      "createdAt": "2026-03-01T09:15:00.000Z"
+    }
+  ],
+  "applications": [
+    {
+      "id": "app-101",
+      "roomId": "room-1",
+      "roomTitle": "Luxury Self-Contained Studio with Standby Plant & Fiber Internet",
+      "roomImage": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=600&q=80",
+      "roomPrice": 3200,
+      "roomCity": "Accra, East Legon",
+      "landlordId": "user-landlord-1",
+      "tenantId": "user-tenant-1",
+      "tenantName": "Emmanuel Owusu",
+      "tenantEmail": "emmanuel.owusu@techaccra.com",
+      "tenantPhone": "+233 55 123 4567",
+      "status": "pending",
+      "moveInDate": "2026-10-05",
+      "leaseMonths": 12,
+      "occupation": "Senior Software Engineer",
+      "monthlyIncome": 16500,
+      "bio": "I work for a remote African tech company. Highly organized, respectful of neighbours, and reliable with rental obligations.",
+      "tourDate": "2026-09-28",
+      "tourType": "inperson",
+      "createdAt": "2026-03-05T10:15:00.000Z"
+    },
+    {
+      "id": "app-102",
+      "roomId": "room-2",
+      "roomTitle": "Master Bedroom En-Suite in Modern Diplomatic Enclave Flat",
+      "roomImage": "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80",
+      "roomPrice": 4500,
+      "roomCity": "Accra, Cantonments",
+      "landlordId": "user-landlord-2",
+      "tenantId": "user-tenant-2",
+      "tenantName": "Naa Dzama Addo",
+      "tenantEmail": "naa.addo@korlebu.org",
+      "tenantPhone": "+233 27 765 4321",
+      "status": "tour_scheduled",
+      "moveInDate": "2026-10-15",
+      "leaseMonths": 12,
+      "occupation": "Medical Doctor (Resident)",
+      "monthlyIncome": 14000,
+      "bio": "Doctor at Ridge Hospital. Looking for a serene home close to Cantonments.",
+      "tourDate": "2026-09-27",
+      "tourType": "virtual",
+      "createdAt": "2026-03-06T14:30:00.000Z"
+    }
+  ],
+  "conversations": [
+    {
+      "id": "conv-1",
+      "participants": [
+        "user-tenant-1",
+        "user-landlord-1"
+      ],
+      "roomId": "room-1",
+      "lastMessage": "Good day Kwame! Is it possible to see the room this Saturday at 2:00 PM?",
+      "updatedAt": "2026-03-06T16:40:00.000Z"
+    },
+    {
+      "id": "conv-2",
+      "participants": [
+        "user-tenant-2",
+        "user-landlord-2"
+      ],
+      "roomId": "room-2",
+      "lastMessage": "Virtual video tour confirmed for Sunday 3 PM via WhatsApp video call.",
+      "updatedAt": "2026-03-07T11:20:00.000Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg-1",
+      "conversationId": "conv-1",
+      "senderId": "user-tenant-1",
+      "senderName": "Emmanuel Owusu",
+      "text": "Hello Mr. Kwame, I submitted my application for the East Legon studio. Does the standby generator switch over automatically during outages?",
+      "timestamp": "2026-03-06T15:10:00.000Z",
+      "read": true
+    },
+    {
+      "id": "msg-2",
+      "conversationId": "conv-1",
+      "senderId": "user-landlord-1",
+      "senderName": "Kwame Mensah",
+      "text": "Hello Emmanuel! Yes, it has an automatic ATS panel with 10-second changeover, so your computer & Wi-Fi will barely flicker.",
+      "timestamp": "2026-03-06T15:25:00.000Z",
+      "read": true
+    },
+    {
+      "id": "msg-3",
+      "conversationId": "conv-1",
+      "senderId": "user-tenant-1",
+      "senderName": "Emmanuel Owusu",
+      "text": "Good day Kwame! Is it possible to see the room this Saturday at 2:00 PM?",
+      "timestamp": "2026-03-06T16:40:00.000Z",
+      "read": false
+    },
+    {
+      "id": "msg-4",
+      "conversationId": "conv-2",
+      "senderId": "user-landlord-2",
+      "senderName": "Akosua Osei",
+      "text": "Virtual video tour confirmed for Sunday 3 PM via WhatsApp video call.",
+      "timestamp": "2026-03-07T11:20:00.000Z",
+      "read": true
+    }
+  ]
+}
