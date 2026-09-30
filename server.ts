@@ -366,24 +366,6 @@ app.post('/api/messages', (req, res) => {
   res.status(201).json({ success: true, data: msg });
 });
 
-app.post('/api/messages/read', (req, res) => {
-  const db = readDb();
-  const { conversationId, readerId } = req.body;
-
-  let count = 0;
-  db.messages.forEach(m => {
-    if (m.conversationId === conversationId && m.senderId !== readerId && !m.read) {
-      m.read = true;
-      count++;
-    }
-  });
-
-  if (count > 0) {
-    writeDb(db);
-  }
-  res.json({ success: true, markedRead: count });
-});
-
 app.listen(PORT, () => {
   console.log(`[RoomShare Backend] REST API server running at http://localhost:${PORT}`);
 });
