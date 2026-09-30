@@ -375,17 +375,44 @@ export const App: React.FC = () => {
 
                 {/* Key Value Prop Pills */}
                 <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-slate-300">
-                  <div className="flex items-center gap-1.5 rounded-full bg-slate-900/90 border border-slate-800 px-3 py-1.5">
+                  <div className="flex items-center gap-1.5 rounded-full bg-slate-900/90 border border-slate-800 px-3 py-1.5 shadow-sm">
                     <Zap className="h-3.5 w-3.5 text-amber-400" />
                     <span>Standby Generator Backups</span>
                   </div>
-                  <div className="flex items-center gap-1.5 rounded-full bg-slate-900/90 border border-slate-800 px-3 py-1.5">
+                  <div className="flex items-center gap-1.5 rounded-full bg-slate-900/90 border border-slate-800 px-3 py-1.5 shadow-sm">
                     <Droplets className="h-3.5 w-3.5 text-cyan-400" />
                     <span>Poly Tank Water Reservoirs</span>
                   </div>
-                  <div className="flex items-center gap-1.5 rounded-full bg-slate-900/90 border border-slate-800 px-3 py-1.5">
+                  <div className="flex items-center gap-1.5 rounded-full bg-slate-900/90 border border-slate-800 px-3 py-1.5 shadow-sm">
                     <Building2 className="h-3.5 w-3.5 text-emerald-400" />
                     <span>Direct Homeowner Contact</span>
+                  </div>
+                </div>
+
+                {/* 3-Step User Friendly Quick Start Banner */}
+                <div className="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div className="flex items-center gap-2.5 rounded-2xl bg-slate-950/60 p-3 border border-slate-800/80">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 font-extrabold text-xs shrink-0">1</span>
+                    <div>
+                      <strong className="text-white block font-bold">1. Filter Rooms</strong>
+                      <span className="text-[11px] text-slate-400">Select city & power backup</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 rounded-2xl bg-slate-950/60 p-3 border border-slate-800/80">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-cyan-500/20 text-cyan-400 font-extrabold text-xs shrink-0">2</span>
+                    <div>
+                      <strong className="text-white block font-bold">2. Schedule Tour</strong>
+                      <span className="text-[11px] text-slate-400">Propose physical or video visit</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 rounded-2xl bg-slate-950/60 p-3 border border-slate-800/80">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400 font-extrabold text-xs shrink-0">3</span>
+                    <div>
+                      <strong className="text-white block font-bold">3. Chat Directly</strong>
+                      <span className="text-[11px] text-slate-400">WhatsApp / Direct Inbox</span>
+                    </div>
                   </div>
                 </div>
               </div>

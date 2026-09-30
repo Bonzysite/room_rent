@@ -19,6 +19,7 @@ export interface Room {
   landlordId: string;
   landlordName: string;
   landlordEmail: string;
+  landlordPhone?: string;
   title: string;
   description: string;
   price: number; // in GH₵ / month

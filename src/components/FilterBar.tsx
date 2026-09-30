@@ -124,8 +124,32 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           </div>
         </div>
 
+        {/* One-Tap Ghana City Quick Chips */}
+        <div className="mt-3 pt-3 border-t border-slate-800/60 flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0 mr-1 flex items-center gap-1">
+            <MapPin className="h-3 w-3 text-emerald-400" /> Cities:
+          </span>
+          {GHANA_CITIES.map((city) => {
+            const active = filters.selectedCity === city;
+            return (
+              <button
+                key={city}
+                type="button"
+                onClick={() => onFilterChange({ ...filters, selectedCity: city })}
+                className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold transition-all ${
+                  active
+                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
+                    : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white'
+                }`}
+              >
+                {city}
+              </button>
+            );
+          })}
+        </div>
+
         {/* Secondary Filter Row: Room Type Pills & Granular Price Slider */}
-        <div className="mt-4 pt-3 border-t border-slate-800/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="mt-3 pt-3 border-t border-slate-800/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           
           {/* Room Type Pills */}
           <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">

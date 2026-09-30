@@ -28,9 +28,21 @@ export const RoomDetailModal: React.FC<RoomDetailModalProps> = ({
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [copiedLink, setCopiedLink] = useState(false);
 
+  // Close modal on Escape key press
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const images = room.images && room.images.length > 0 ? room.images : [
     'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80'
   ];
+
+  const phoneClean = room.landlordPhone ? room.landlordPhone.replace(/[^0-9]/g, '') : '233244128990';
+  const whatsappUrl = `https://wa.me/${phoneClean}?text=${encodeURIComponent(`Hi ${room.landlordName}, I am inquiring about "${room.title}" listed for GH₵ ${room.price.toLocaleString()}/mo on RoomShare Ghana.`)}`;
 
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href);
@@ -238,14 +250,24 @@ export const RoomDetailModal: React.FC<RoomDetailModalProps> = ({
                   Zero scam policy. Payments are protected until in-person handover and agreement execution.
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => onMessageLandlord(room)}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-2.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500/20 active:scale-95 transition-all"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Message Landlord
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onMessageLandlord(room)}
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-2.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500/20 active:scale-95 transition-all"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Chat Inbox
+                  </button>
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 py-2.5 text-xs font-bold text-white shadow-md shadow-emerald-600/20 active:scale-95 transition-all"
+                  >
+                    💬 WhatsApp
+                  </a>
+                </div>
               </div>
 
               {/* Direct Booking/Application Action Card */}
