@@ -358,16 +358,24 @@ export const App: React.FC = () => {
             
             {/* Hero Section */}
             <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950/60 p-6 sm:p-10 shadow-2xl">
-              <div className="relative z-10 max-w-3xl space-y-4">
+              <div className="relative z-10 max-w-4xl space-y-4">
                 
-                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">
-                  <ShieldCheck className="h-4 w-4" />
-                  <span>100% Title-Verified Rentals in Ghana</span>
-                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl bg-white p-1.5 shadow-xl ring-2 ring-emerald-500/40 shrink-0">
+                    <img src="/logo.png" alt="Roomshare Ghana Logo" className="h-full w-full object-contain" />
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">
+                      <ShieldCheck className="h-4 w-4" />
+                      <span>100% Title-Verified Rentals in Ghana</span>
+                    </div>
 
-                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                  Find verified rooms, flats & homes <span className="gradient-text-emerald">all over Ghana</span>
-                </h1>
+                    <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                      Find verified rooms, flats & homes <span className="gradient-text-emerald">all over Ghana</span>
+                    </h1>
+                  </div>
+                </div>
 
                 <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl">
                   Discover residential accommodation across Accra, Kumasi, Takoradi, Tema, Cape Coast & Tamale. Rent directly from verified property owners with zero agency extortion, transparent GH₵ pricing, and standby generator & poly tank guarantees.
@@ -612,10 +620,12 @@ export const App: React.FC = () => {
       {/* Footer */}
       <footer className="mt-16 border-t border-slate-900 bg-slate-950 py-10 px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-white">RoomShare Ghana</span>
-            <span>•</span>
-            <span>Accra, Kumasi & Takoradi Residential Rentals</span>
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="Roomshare Ghana Logo" className="h-8 w-8 object-contain rounded-lg bg-white p-0.5" />
+            <div className="text-left">
+              <span className="font-extrabold text-white text-sm block leading-tight">Roomshare Ghana</span>
+              <p className="text-[11px] text-slate-400">Accra, Kumasi, Takoradi & Tema Residential Rentals</p>
+            </div>
           </div>
           <div className="flex items-center gap-4 text-[11px] text-slate-400">
             <span>Verified Residential Accommodation</span>

@@ -35,19 +35,24 @@ export const TenantApplicationsView: React.FC<TenantApplicationsViewProps> = ({
       
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-3xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900/90 to-teal-950/40 p-6 shadow-xl">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-teal-500/20 text-teal-400">
-              <Layers className="h-4 w-4" />
-            </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-teal-400">Tenant Hub</span>
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="h-14 w-14 rounded-2xl bg-white p-1 shadow-lg shrink-0 ring-2 ring-teal-500/30">
+            <img src="/logo.png" alt="Roomshare Ghana Logo" className="h-full w-full object-contain" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-            Renters Control Center
-          </h1>
-          <p className="text-xs text-slate-400">
-            Track your rental submissions, verify inspection schedules, and chat directly with verified homeowners.
-          </p>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-teal-500/20 text-teal-400">
+                <Layers className="h-3.5 w-3.5" />
+              </span>
+              <span className="text-xs font-bold uppercase tracking-wider text-teal-400">Tenant Hub</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+              Renters Control Center
+            </h1>
+            <p className="text-xs text-slate-400">
+              Track your rental submissions, verify inspection schedules, and chat directly with verified homeowners.
+            </p>
+          </div>
         </div>
 
         {/* View Switcher */}
