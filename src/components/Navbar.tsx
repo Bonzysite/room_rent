@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Compass, PlusCircle, Bookmark, MessageSquare, UserCheck, Shield, ChevronDown, Layers, LogOut, Sun, Moon } from 'lucide-react';
+import { Home, Compass, PlusCircle, Bookmark, MessageSquare, UserCheck, Shield, ChevronDown, Layers, LogOut, Sun, Moon, Menu, X } from 'lucide-react';
 import { User } from '../types';
 
 interface NavbarProps {
@@ -26,6 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCreateWizard,
 }) => {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isLandlord = currentUser.role === 'landlord';
 
@@ -145,8 +146,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </nav>
 
-        {/* Right CTA & Profile Gate */}
-        <div className="flex items-center gap-3">
+        {/* Right CTA, Theme Toggle & Hamburger Button */}
+        <div className="flex items-center gap-2 sm:gap-3">
           
           {/* Dark / Light Mode Toggle Button */}
           <button
@@ -169,6 +170,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               Post a Room
             </button>
           )}
+
+          {/* Mobile Hamburger Menu Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 hover:text-white hover:border-emerald-500 transition-all"
+            aria-label="Toggle Mobile Navigation Menu"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5 text-emerald-400" /> : <Menu className="h-5 w-5 text-emerald-400" />}
+          </button>
 
           {/* User Profile Dropdown Menu */}
           <div className="relative">
@@ -234,6 +245,128 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Mobile Slide-Down Hamburger Navigation Drawer */}
+      {mobileMenuOpen && (
+        <div 
+          className="md:hidden border-t border-slate-800/80 bg-slate-950/95 p-4 space-y-3 backdrop-blur-2xl animate-in slide-in-from-top duration-200 shadow-2xl"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div className="space-y-1">
+            <button
+              onClick={() => onSelectTab('browse')}
+              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-xs font-bold transition-all ${
+                currentTab === 'browse'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25'
+                  : 'text-slate-200 bg-slate-900/60 border border-slate-800/80'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Compass className="h-4 w-4" />
+                Browse Rooms
+              </span>
+              <span className="text-[10px] text-slate-400 font-normal">Explore Listings</span>
+            </button>
+
+            {!isLandlord && (
+              <button
+                onClick={() => onSelectTab('tenant-hub')}
+                className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-xs font-bold transition-all ${
+                  currentTab === 'tenant-hub'
+                    ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25'
+                    : 'text-slate-200 bg-slate-900/60 border border-slate-800/80'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Layers className="h-4 w-4" />
+                  Tenant Control Hub
+                </span>
+                <span className="text-[10px] text-slate-400 font-normal">Applications</span>
+              </button>
+            )}
+
+            {isLandlord && (
+              <button
+                onClick={() => onSelectTab('landlord')}
+                className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-xs font-bold transition-all ${
+                  currentTab === 'landlord'
+                    ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25'
+                    : 'text-slate-200 bg-slate-900/60 border border-slate-800/80'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Landlord Portal
+                </span>
+                <span className="text-[10px] text-slate-400 font-normal">Manage Properties</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => onSelectTab('saved')}
+              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-xs font-bold transition-all ${
+                currentTab === 'saved'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25'
+                  : 'text-slate-200 bg-slate-900/60 border border-slate-800/80'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <Bookmark className="h-4 w-4" />
+                Saved Wishlist
+              </span>
+              {savedCount > 0 && (
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                  {savedCount} Saved
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => onSelectTab('messages')}
+              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-xs font-bold transition-all ${
+                currentTab === 'messages'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25'
+                  : 'text-slate-200 bg-slate-900/60 border border-slate-800/80'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Messages Inbox
+              </span>
+              {unreadCount > 0 && (
+                <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-slate-950 animate-pulse">
+                  {unreadCount} New
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => onSelectTab('profile')}
+              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 text-xs font-bold transition-all ${
+                currentTab === 'profile'
+                  ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/25'
+                  : 'text-slate-200 bg-slate-900/60 border border-slate-800/80'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <UserCheck className="h-4 w-4" />
+                Manage Profile & Account
+              </span>
+              <span className="text-[10px] text-emerald-400 font-semibold uppercase">{currentUser.role}</span>
+            </button>
+          </div>
+
+          {isLandlord && (
+            <button
+              onClick={handlePostRoomClick}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3 text-xs font-bold text-slate-950 shadow-lg shadow-emerald-500/20 active:scale-95 transition-all mt-2"
+            >
+              <PlusCircle className="h-4 w-4 stroke-[2.5]" />
+              Post a New Property Listing
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Mobile Bottom Navigation Bar (Strictly Role Gated) */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-800 bg-slate-950/95 backdrop-blur-xl px-2 py-2 flex items-center justify-around">
