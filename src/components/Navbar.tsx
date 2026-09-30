@@ -251,6 +251,28 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="md:hidden border-t border-slate-800/80 bg-slate-950/95 p-4 space-y-3 backdrop-blur-2xl animate-in slide-in-from-top duration-200 shadow-2xl"
           onClick={() => setMobileMenuOpen(false)}
         >
+          {/* User Profile Summary Card at Top of Mobile Drawer */}
+          <div 
+            onClick={() => onSelectTab('profile')}
+            className="flex items-center gap-3 rounded-2xl bg-slate-900/90 p-3 border border-slate-800 cursor-pointer hover:border-emerald-500/50 transition-all mb-2"
+          >
+            <img
+              src={currentUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}`}
+              alt={currentUser.name}
+              className="h-11 w-11 rounded-xl object-cover ring-2 ring-emerald-500/40 shrink-0"
+            />
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-xs font-black text-white truncate">{currentUser.name}</p>
+              <p className="text-[11px] text-slate-400 truncate">{currentUser.email}</p>
+              <span className={`inline-block mt-0.5 rounded px-2 py-0.2 text-[9px] font-bold uppercase tracking-wider ${
+                isLandlord ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
+              }`}>
+                {currentUser.role} Account • Tap to view profile
+              </span>
+            </div>
+            <UserCheck className="h-5 w-5 text-emerald-400 shrink-0" />
+          </div>
+
           <div className="space-y-1">
             <button
               onClick={() => onSelectTab('browse')}
@@ -364,15 +386,23 @@ export const Navbar: React.FC<NavbarProps> = ({
               Post a New Property Listing
             </button>
           )}
+
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center justify-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 py-2.5 text-xs font-bold text-rose-400 active:scale-95 transition-all"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out Account
+          </button>
         </div>
       )}
 
       {/* Mobile Bottom Navigation Bar (Strictly Role Gated) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-800 bg-slate-950/95 backdrop-blur-xl px-2 py-2 flex items-center justify-around">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-800 bg-slate-950/95 backdrop-blur-xl px-1 py-2 flex items-center justify-around">
         <button
           onClick={() => onSelectTab('browse')}
           className={`flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-            currentTab === 'browse' ? 'text-emerald-400' : 'text-slate-400'
+            currentTab === 'browse' ? 'text-emerald-400 font-bold' : 'text-slate-400'
           }`}
         >
           <Compass className="h-5 w-5" />
@@ -383,7 +413,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={() => onSelectTab('tenant-hub')}
             className={`flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-              currentTab === 'tenant-hub' ? 'text-emerald-400' : 'text-slate-400'
+              currentTab === 'tenant-hub' ? 'text-emerald-400 font-bold' : 'text-slate-400'
             }`}
           >
             <Layers className="h-5 w-5" />
@@ -395,7 +425,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={() => onSelectTab('landlord')}
             className={`flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-              currentTab === 'landlord' ? 'text-emerald-400' : 'text-slate-400'
+              currentTab === 'landlord' ? 'text-emerald-400 font-bold' : 'text-slate-400'
             }`}
           >
             <Shield className="h-5 w-5" />
@@ -406,7 +436,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={() => onSelectTab('messages')}
           className={`relative flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-            currentTab === 'messages' ? 'text-emerald-400' : 'text-slate-400'
+            currentTab === 'messages' ? 'text-emerald-400 font-bold' : 'text-slate-400'
           }`}
         >
           <MessageSquare className="h-5 w-5" />
@@ -421,11 +451,21 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={() => onSelectTab('saved')}
           className={`relative flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-            currentTab === 'saved' ? 'text-emerald-400' : 'text-slate-400'
+            currentTab === 'saved' ? 'text-emerald-400 font-bold' : 'text-slate-400'
           }`}
         >
           <Bookmark className="h-5 w-5" />
           Saved
+        </button>
+
+        <button
+          onClick={() => onSelectTab('profile')}
+          className={`relative flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
+            currentTab === 'profile' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+          }`}
+        >
+          <UserCheck className="h-5 w-5" />
+          Profile
         </button>
       </div>
     </header>

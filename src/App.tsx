@@ -350,7 +350,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Page Body */}
-      <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <main className="flex-1 mx-auto w-full max-w-7xl px-4 pt-6 pb-24 md:pb-8 sm:px-6 lg:px-8">
         
         {/* VIEW 1: Browse / Discovery (Section 4A) */}
         {currentTab === 'browse' && (
