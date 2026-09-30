@@ -64,6 +64,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         id: `user-${Date.now()}`,
         name: regName.trim(),
         email: regEmail.toLowerCase().trim(),
+        password: regPassword,
         role: regRole,
         phone: regPhone.trim() || '+233 24 000 0000',
         bio: regBio.trim() || (regRole === 'landlord' ? 'Verified property manager' : 'Tenant seeking accommodation'),

@@ -1,7 +1,7 @@
 import { DatabaseSchema, Room, RoomApplication, Conversation, Message, User } from '../types';
 import { storage } from './storage';
 import { supabaseApi, isSupabaseConfigured } from './supabase';
-import { auth } from './auth';
+import { auth, DEMO_USERS } from './auth';
 import { RlsPolicy } from '../security/rls';
 
 const API_BASE = '/api';
@@ -11,7 +11,13 @@ export const api = {
     // 1. Try Supabase first if configured
     if (isSupabaseConfigured()) {
       const supaData = await supabaseApi.getFullData();
-      if (supaData && supaData.rooms.length > 0) {
+      if (supaData) {
+        const cached = storage.getDbCache();
+        if (cached && Array.isArray(cached.users)) {
+          const supaUserEmails = new Set((supaData.users || []).map(u => u.email.toLowerCase()));
+          const localUsersToKeep = cached.users.filter(u => u && u.email && !supaUserEmails.has(u.email.toLowerCase()));
+          supaData.users = [...(supaData.users || []), ...localUsersToKeep];
+        }
         storage.setDbCache(supaData);
         return supaData;
       }
@@ -364,14 +370,23 @@ export const api = {
       }
     }
 
-    // 2. Query REST backend database / cached profiles
+    // 2. Query local database cache
     const cached = storage.getDbCache();
-    const localUser = cached?.users?.find(u => u.email.toLowerCase() === formattedEmail);
+    const localUser = cached?.users?.find(u => u && u.email && u.email.toLowerCase() === formattedEmail);
     if (localUser) {
       if (role && localUser.role !== role) {
         throw new Error(`Account registered as "${localUser.role}". Please select ${localUser.role === 'landlord' ? 'Landlord Mode' : 'Tenant Mode'}.`);
       }
       return localUser;
+    }
+
+    // 3. Fallback to pre-loaded demo profiles
+    const demoUser = Object.values(DEMO_USERS).find((u: User) => u && u.email && u.email.toLowerCase() === formattedEmail);
+    if (demoUser) {
+      if (role && demoUser.role !== role) {
+        throw new Error(`Account registered as "${demoUser.role}". Please select ${demoUser.role === 'landlord' ? 'Landlord Mode' : 'Tenant Mode'}.`);
+      }
+      return demoUser;
     }
 
     throw new Error('No user account found in database matching this email. Please register a new profile first.');
@@ -380,33 +395,34 @@ export const api = {
   async registerUserInDb(user: User): Promise<User> {
     const formattedEmail = user.email.toLowerCase().trim();
 
-    // Check if user email already exists in Supabase
+    // Check if user email already exists in Supabase or local cache
     if (isSupabaseConfigured()) {
       const existing = await supabaseApi.getUserByEmail(formattedEmail);
       if (existing) {
         throw new Error('An account with this email address already exists in the database. Please sign in instead.');
       }
-
-      const supaUser = await supabaseApi.registerUserInDb(user);
-      if (supaUser) {
-        const cached = storage.getDbCache();
-        if (cached) {
-          cached.users.push(supaUser);
-          storage.setDbCache(cached);
-        }
-        return supaUser;
-      }
     }
 
-    // Fallback to local database cache
     const db = storage.getDbCache() || { users: [], rooms: [], applications: [], conversations: [], messages: [] };
-    const existingLocal = db.users.find(u => u.email.toLowerCase() === formattedEmail);
+    const existingLocal = db.users.find(u => u && u.email && u.email.toLowerCase() === formattedEmail);
     if (existingLocal) {
       throw new Error('An account with this email address already exists in the database. Please sign in instead.');
     }
 
-    db.users.push(user);
-    storage.setDbCache(db);
-    return user;
+    // Try registering in Supabase
+    let supaUser: User | null = null;
+    if (isSupabaseConfigured()) {
+      supaUser = await supabaseApi.registerUserInDb(user);
+    }
+
+    const finalUser = supaUser || user;
+
+    // Always push to local cache as guaranteed persistent backup
+    if (!db.users.some(u => u && u.email && u.email.toLowerCase() === formattedEmail)) {
+      db.users.push(finalUser);
+      storage.setDbCache(db);
+    }
+
+    return finalUser;
   }
 };

@@ -262,11 +262,12 @@ export const supabaseApi = {
 
   async getUserByEmail(email: string): Promise<User | null> {
     if (!isSupabaseConfigured()) return null;
+    const cleanEmail = email.toLowerCase().trim();
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('email', email.toLowerCase().trim())
+        .ilike('email', cleanEmail)
         .maybeSingle();
 
       if (error || !data) return null;
@@ -290,18 +291,19 @@ export const supabaseApi = {
   async registerUserInDb(user: User): Promise<User | null> {
     if (!isSupabaseConfigured()) return null;
     try {
+      const cleanEmail = user.email.toLowerCase().trim();
       const { data, error } = await supabase
         .from('profiles')
-        .insert([{
+        .upsert([{
           id: user.id,
           name: user.name,
-          email: user.email.toLowerCase().trim(),
+          email: cleanEmail,
           role: user.role,
           phone: user.phone,
           bio: user.bio,
           avatar: user.avatar,
           created_at: user.createdAt || new Date().toISOString()
-        }])
+        }], { onConflict: 'email' })
         .select()
         .single();
 
