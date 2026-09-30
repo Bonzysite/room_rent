@@ -89,11 +89,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         
         {/* Top Header */}
         <div className="border-b border-slate-800/80 bg-slate-950/60 p-6 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-slate-950 shadow-lg shadow-emerald-500/20">
-            <Home className="h-6 w-6 stroke-[2.5]" />
+          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/90 p-1 shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-500/30">
+            <img
+              src="/logo.png"
+              alt="Roomshare Ghana Logo"
+              className="h-full w-full object-contain"
+            />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-white">
-            Room<span className="text-emerald-400">Share</span> Ghana
+            Room<span className="text-emerald-400">share</span> Ghana
           </h1>
           <p className="mt-1 text-xs text-slate-400">
             Verified Residential Rentals • Landlord & Tenant Access Control

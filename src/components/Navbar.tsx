@@ -44,20 +44,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand Logo */}
         <div 
           onClick={() => onSelectTab('browse')}
-          className="flex cursor-pointer items-center gap-3 group"
+          className="flex cursor-pointer items-center gap-2.5 group"
         >
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-700 shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-            <Home className="h-5 w-5 text-slate-950 stroke-[2.5]" />
-            <span className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-400 text-[8px] font-bold text-slate-950 shadow">
-              GH
-            </span>
-          </div>
+          <img
+            src="/logo.png"
+            alt="Roomshare Ghana Logo"
+            className="h-10 w-10 sm:h-11 sm:w-11 object-contain rounded-xl bg-white/90 p-0.5 shadow-md shadow-emerald-500/10 group-hover:scale-105 transition-transform"
+          />
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xl font-bold tracking-tight text-white group-hover:text-emerald-400 transition-colors">
-                Room<span className="text-emerald-400">Share</span>
+              <span className="text-xl font-extrabold tracking-tight text-white group-hover:text-emerald-400 transition-colors">
+                Room<span className="text-emerald-400">share</span>
               </span>
-              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-emerald-400 border border-emerald-500/20">
+              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wide text-emerald-400 border border-emerald-500/20">
                 GHANA
               </span>
             </div>
