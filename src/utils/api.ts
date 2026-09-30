@@ -6,6 +6,21 @@ import { RlsPolicy } from '../security/rls';
 
 const API_BASE = '/api';
 
+/**
+ * Helper to safely fetch JSON without throwing SyntaxError when static hosts return HTML fallback.
+ */
+async function safeFetchJson<T = any>(url: string, options?: RequestInit): Promise<T | null> {
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) return null;
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
 export const api = {
   async getFullData(): Promise<DatabaseSchema> {
     // 1. Try Supabase first if configured
@@ -23,17 +38,11 @@ export const api = {
       }
     }
 
-    // 2. Try REST backend
-    try {
-      const res = await fetch(`${API_BASE}/data`);
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      const json = await res.json();
-      if (json.data) {
-        storage.setDbCache(json.data);
-        return json.data;
-      }
-    } catch (e) {
-      console.warn('API getFullData failed, checking cache:', e);
+    // 2. Try REST backend safely
+    const json = await safeFetchJson<{ data?: DatabaseSchema }>(`${API_BASE}/data`);
+    if (json?.data) {
+      storage.setDbCache(json.data);
+      return json.data;
     }
 
     const cached = storage.getDbCache();
@@ -44,40 +53,32 @@ export const api = {
   },
 
   async sync(data: Partial<DatabaseSchema>): Promise<DatabaseSchema> {
-    try {
-      const res = await fetch(`${API_BASE}/sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      const json = await res.json();
+    const json = await safeFetchJson<{ data?: DatabaseSchema }>(`${API_BASE}/sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (json?.data) {
       storage.setDbCache(json.data);
       return json.data;
-    } catch (e) {
-      console.warn('API sync failed, updating local cache only:', e);
-      const current = storage.getDbCache() || { users: [], rooms: [], applications: [], conversations: [], messages: [] };
-      const merged: DatabaseSchema = {
-        users: data.users || current.users,
-        rooms: data.rooms || current.rooms,
-        applications: data.applications || current.applications,
-        conversations: data.conversations || current.conversations,
-        messages: data.messages || current.messages
-      };
-      storage.setDbCache(merged);
-      return merged;
     }
+
+    const current = storage.getDbCache() || { users: [], rooms: [], applications: [], conversations: [], messages: [] };
+    const merged: DatabaseSchema = {
+      users: data.users || current.users,
+      rooms: data.rooms || current.rooms,
+      applications: data.applications || current.applications,
+      conversations: data.conversations || current.conversations,
+      messages: data.messages || current.messages
+    };
+    storage.setDbCache(merged);
+    return merged;
   },
 
   async getRooms(): Promise<Room[]> {
-    try {
-      const res = await fetch(`${API_BASE}/rooms`);
-      if (res.ok) {
-        const json = await res.json();
-        return json.data || [];
-      }
-    } catch {
-      // fallback
+    const json = await safeFetchJson<{ data?: Room[] }>(`${API_BASE}/rooms`);
+    if (json?.data) {
+      return json.data;
     }
     const cached = storage.getDbCache();
     return cached?.rooms || [];
