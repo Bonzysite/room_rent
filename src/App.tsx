@@ -50,13 +50,8 @@ export const App: React.FC = () => {
     });
   };
 
-  // User & Auth State
+  // User & Auth State - Starts from Login page
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  // Load persisted user if available
-  useEffect(() => {
-    const stored = auth.getUser();
-    if (stored) setCurrentUser(stored);
-  }, []);
 
   // Active navigation tab
   const [currentTab, setCurrentTab] = useState<'browse' | 'landlord' | 'tenant-hub' | 'saved' | 'messages' | 'profile'>('browse');
