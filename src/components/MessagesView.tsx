@@ -98,7 +98,7 @@ export const MessagesView: React.FC<MessagesViewProps> = ({
       
       {/* Sidebar: WhatsApp-style Conversation List */}
       <div className={`w-full md:w-80 lg:w-96 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col bg-slate-950/70 ${
-        selectedConv && activeConversationId ? 'hidden md:flex' : 'flex'
+        activeConversationId ? 'hidden md:flex' : 'flex'
       }`}>
         
         {/* Sidebar Header & Search Bar */}
@@ -206,7 +206,7 @@ export const MessagesView: React.FC<MessagesViewProps> = ({
       {/* Main Chat Panel (WhatsApp Chat Window) */}
       {selectedConv ? (
         <div className={`flex-1 flex flex-col bg-slate-900/40 ${
-          !selectedConv && !activeConversationId ? 'hidden md:flex' : 'flex'
+          activeConversationId ? 'flex' : 'hidden md:flex'
         }`}>
           
           {/* WhatsApp Header Bar */}
