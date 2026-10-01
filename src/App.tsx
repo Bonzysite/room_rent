@@ -9,6 +9,7 @@ import { LandlordDashboard } from './components/LandlordDashboard';
 import { TenantApplicationsView } from './components/TenantApplicationsView';
 import { MessagesView } from './components/MessagesView';
 import { ProfileView } from './components/ProfileView';
+import { MapExplorer } from './components/MapExplorer';
 
 import { Room, RoomApplication, Conversation, Message, User, UserRole, RoomStatus } from './types';
 import { api } from './utils/api';
@@ -18,7 +19,7 @@ import { subscribeToRealtime } from './utils/supabase';
 
 import { 
   ShieldCheck, Zap, Droplets, Heart, Sparkles, Building2, 
-  MapPin, CheckCircle2, ArrowRight, Compass 
+  MapPin, CheckCircle2, ArrowRight, Compass, LayoutGrid, Map as MapIcon 
 } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -54,8 +55,9 @@ export const App: React.FC = () => {
   // User & Auth State - Starts from Login page
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  // Active navigation tab
+  // Active navigation tab & view mode
   const [currentTab, setCurrentTab] = useState<'browse' | 'landlord' | 'tenant-hub' | 'saved' | 'messages' | 'profile'>('browse');
+  const [browseViewMode, setBrowseViewMode] = useState<'grid' | 'map'>('grid');
 
   // Wishlist
   const [savedRoomIds, setSavedRoomIds] = useState<string[]>(() => storage.getFavorites());
@@ -428,15 +430,56 @@ export const App: React.FC = () => {
               <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
             </div>
 
-            {/* Filter Bar Component (Section 4A) */}
-            <FilterBar
-              filters={filters}
-              onFilterChange={setFilters}
-              totalResults={filteredRooms.length}
-            />
+            {/* Filter Bar Component (Section 4A) & View Mode Switcher */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">Catalog View Mode</span>
+                </div>
 
-            {/* Rooms Grid */}
-            {isLoading ? (
+                <div className="flex items-center gap-1 rounded-2xl border border-slate-800 bg-slate-950 p-1 shadow-lg">
+                  <button
+                    onClick={() => setBrowseViewMode('grid')}
+                    className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                      browseViewMode === 'grid'
+                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                    Grid View
+                  </button>
+
+                  <button
+                    onClick={() => setBrowseViewMode('map')}
+                    className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                      browseViewMode === 'map'
+                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <MapIcon className="h-4 w-4" />
+                    Map Explorer
+                  </button>
+                </div>
+              </div>
+
+              <FilterBar
+                filters={filters}
+                onFilterChange={setFilters}
+                totalResults={filteredRooms.length}
+              />
+            </div>
+
+            {/* Rooms View: Grid vs Map Explorer */}
+            {browseViewMode === 'map' ? (
+              <MapExplorer
+                rooms={filteredRooms}
+                selectedCity={filters.selectedCity}
+                onSelectRoom={(r) => setSelectedRoomForDetail(r)}
+                onApplyRoom={(r) => setSelectedRoomForApp(r)}
+              />
+            ) : isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div key={i} className="h-80 rounded-2xl bg-slate-900/50 animate-pulse border border-slate-800" />

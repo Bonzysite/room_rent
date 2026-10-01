@@ -35,6 +35,8 @@ export interface Room {
   minLeaseMonths: number; // 6, 12, 24
   rules: string[]; // No smoking, Pets allowed, Quiet hours after 10 PM, etc.
   status: RoomStatus;
+  lat?: number;
+  lng?: number;
   createdAt: string;
 }
 
