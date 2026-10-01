@@ -50,6 +50,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({
   const [activeCity, setActiveCity] = useState<string>(selectedCity || 'All Cities');
   const [hoveredRoomId, setHoveredRoomId] = useState<string | null>(null);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(rooms[0] || null);
+  const [mapLayer, setMapLayer] = useState<'m' | 'k' | 'h'>('m'); // m = Roadmap, k = Satellite, h = Hybrid
 
   // Filter rooms by city selection
   const cityRooms = useMemo(() => {
@@ -67,31 +68,29 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({
     return currentCityCoords;
   };
 
-  // Convert lat/lng to relative percentage position on visual map canvas
-  const getRelativePosition = (lat: number, lng: number) => {
-    // Basic projection relative to Ghana bounds
-    const minLat = 4.5;
-    const maxLat = 11.0;
-    const minLng = -3.5;
-    const maxLng = 1.2;
-
-    if (activeCity !== 'All Cities') {
-      // Localized city offset projection
-      const center = currentCityCoords;
-      const x = 50 + ((lng - center.lng) * 450);
-      const y = 50 - ((lat - center.lat) * 450);
-      return {
-        x: Math.max(10, Math.min(90, x)),
-        y: Math.max(10, Math.min(90, y))
-      };
+  // Determine active query for Google Maps embed
+  const activeMapQuery = useMemo(() => {
+    if (selectedRoom) {
+      if (selectedRoom.lat && selectedRoom.lng) {
+        return `${selectedRoom.lat},${selectedRoom.lng}`;
+      }
+      return `${selectedRoom.neighborhood}, ${selectedRoom.city}, Ghana`;
     }
+    if (activeCity !== 'All Cities') {
+      return `${activeCity}, Ghana`;
+    }
+    return `Accra, Ghana`;
+  }, [selectedRoom, activeCity]);
 
-    const x = ((lng - minLng) / (maxLng - minLng)) * 100;
-    const y = 100 - (((lat - minLat) / (maxLat - minLat)) * 100);
-    return {
-      x: Math.max(8, Math.min(92, x)),
-      y: Math.max(8, Math.min(92, y))
-    };
+  // Google Maps Embed URL
+  const googleMapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(activeMapQuery)}&t=${mapLayer}&z=14&ie=UTF8&iwloc=&output=embed`;
+
+  // Direct Google Maps Mobile/Desktop App Navigation URL
+  const getGoogleMapsNavUrl = (room: Room) => {
+    if (room.lat && room.lng) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${room.lat},${room.lng}`;
+    }
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${room.address || room.neighborhood}, ${room.city}, Ghana`)}`;
   };
 
   return (
@@ -100,10 +99,14 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({
       {/* Map City & Region Navigation Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 p-3 shadow-xl backdrop-blur-md">
         <div className="flex items-center gap-2">
-          <Navigation className="h-4 w-4 text-emerald-400" />
-          <span className="text-xs font-bold text-white">Interactive Location Explorer</span>
+          <img 
+            src="https://www.google.com/favicon.ico" 
+            alt="Google Maps" 
+            className="h-4 w-4 shrink-0" 
+          />
+          <span className="text-xs font-bold text-white">Google Maps Ghana Property Explorer</span>
           <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400">
-            {cityRooms.length} Properties Pinned
+            {cityRooms.length} Pinned Properties
           </span>
         </div>
 
@@ -129,83 +132,80 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({
         </div>
       </div>
 
-      {/* Main Map Visualization Canvas & Details Panel Split */}
+      {/* Main Map Visualization & Details Panel Split */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Interactive Map Visualizer */}
-        <div className="lg:col-span-2 relative h-[420px] sm:h-[480px] w-full overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/40 shadow-2xl">
+        {/* Google Maps Visualizer Viewport */}
+        <div className="lg:col-span-2 flex flex-col space-y-3">
           
-          {/* Stylized Grid Vector Overlay */}
-          <div 
-            className="absolute inset-0 opacity-15 pointer-events-none"
-            style={{
-              backgroundImage: `radial-gradient(circle at 1px 1px, rgba(52, 211, 153, 0.4) 1px, transparent 0)`,
-              backgroundSize: '28px 28px'
-            }}
-          />
+          {/* Map Layer Selector Toolbar */}
+          <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/80 p-2 text-xs">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-emerald-400" />
+              <span className="font-bold text-white truncate max-w-[200px] sm:max-w-none">
+                {selectedRoom ? `${selectedRoom.title} (${selectedRoom.neighborhood})` : `${activeCity} Region`}
+              </span>
+            </div>
 
-          {/* Ghana Geographical Landmark Labels */}
-          <div className="absolute top-4 left-4 z-10 space-y-1 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 backdrop-blur-md">
-            <p className="text-[11px] font-bold text-white flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 text-emerald-400" />
-              {activeCity} Map View
-            </p>
-            <p className="text-[10px] text-slate-400">Click any pin marker to preview listing details</p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setMapLayer('m')}
+                className={`rounded-lg px-2.5 py-1 text-[10px] font-bold transition-all ${
+                  mapLayer === 'm' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white bg-slate-900'
+                }`}
+              >
+                Roadmap
+              </button>
+              <button
+                onClick={() => setMapLayer('k')}
+                className={`rounded-lg px-2.5 py-1 text-[10px] font-bold transition-all ${
+                  mapLayer === 'k' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white bg-slate-900'
+                }`}
+              >
+                Satellite
+              </button>
+              <button
+                onClick={() => setMapLayer('h')}
+                className={`rounded-lg px-2.5 py-1 text-[10px] font-bold transition-all ${
+                  mapLayer === 'h' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-white bg-slate-900'
+                }`}
+              >
+                Hybrid
+              </button>
+            </div>
           </div>
 
-          {/* Map Pins Grid */}
-          <div className="relative h-full w-full">
-            {cityRooms.map((room) => {
-              const coords = getRoomCoords(room);
-              const pos = getRelativePosition(coords.lat, coords.lng);
-              const isSelected = selectedRoom?.id === room.id;
-              const isHovered = hoveredRoomId === room.id;
+          {/* Embedded Interactive Google Map Iframe Container */}
+          <div className="relative h-[400px] sm:h-[460px] w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl">
+            <iframe
+              title="Google Maps Location View"
+              src={googleMapEmbedUrl}
+              className="h-full w-full border-0 filter brightness-95 contrast-105"
+              loading="lazy"
+              allowFullScreen
+            />
 
-              return (
-                <div
-                  key={room.id}
-                  style={{
-                    position: 'absolute',
-                    left: `${pos.x}%`,
-                    top: `${pos.y}%`,
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: isSelected ? 30 : isHovered ? 20 : 10
-                  }}
-                  onMouseEnter={() => setHoveredRoomId(room.id)}
-                  onMouseLeave={() => setHoveredRoomId(null)}
-                  onClick={() => setSelectedRoom(room)}
-                  className="cursor-pointer group transition-all"
-                >
-                  {/* Pin Badge */}
-                  <div className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-black shadow-xl transition-all duration-200 transform ${
-                    isSelected
-                      ? 'bg-emerald-400 text-slate-950 border-white ring-4 ring-emerald-500/40 scale-110'
-                      : isHovered
-                      ? 'bg-amber-400 text-slate-950 border-amber-300 scale-105'
-                      : 'bg-slate-900/90 text-emerald-400 border-emerald-500/40 hover:border-emerald-400'
-                  }`}>
-                    <Building2 className="h-3.5 w-3.5" />
-                    <span>GH₵ {room.price.toLocaleString()}</span>
-                  </div>
-
-                  {/* Pulsing indicator dot */}
-                  <span className={`mx-auto mt-0.5 block h-2 w-2 rounded-full ${
-                    isSelected ? 'bg-emerald-400 animate-ping' : 'bg-emerald-500/60'
-                  }`} />
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Map Controls */}
-          <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800 backdrop-blur-md">
-            <button
-              onClick={() => setActiveCity(activeCity)}
-              className="p-1.5 text-slate-300 hover:text-emerald-400 transition-colors"
-              title="Reset View"
-            >
-              <Compass className="h-4 w-4" />
-            </button>
+            {/* Quick Property Selector Pins Bar Overlay */}
+            <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center gap-2 overflow-x-auto p-2 bg-slate-950/85 backdrop-blur-md rounded-2xl border border-slate-800">
+              {cityRooms.map((room) => {
+                const isSelected = selectedRoom?.id === room.id;
+                return (
+                  <button
+                    key={room.id}
+                    onClick={() => setSelectedRoom(room)}
+                    className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-bold transition-all shrink-0 border ${
+                      isSelected
+                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-lg shadow-emerald-500/30'
+                        : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <Building2 className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate max-w-[110px]">{room.neighborhood}</span>
+                    <span className="font-extrabold text-[11px]">GH₵ {room.price.toLocaleString()}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -261,6 +261,17 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({
                 <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
                   {selectedRoom.description}
                 </p>
+
+                {/* Google Maps GPS Direct Button */}
+                <a
+                  href={getGoogleMapsNavUrl(selectedRoom)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 py-2 px-3 text-xs font-bold text-emerald-300 transition-all w-full"
+                >
+                  <Navigation className="h-3.5 w-3.5 text-emerald-400" />
+                  Open Turn-by-Turn GPS on Google Maps App
+                </a>
               </div>
 
               {/* Action Buttons */}
@@ -285,9 +296,9 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({
           ) : (
             <div className="h-full rounded-3xl border border-dashed border-slate-800 p-8 text-center text-slate-400 flex flex-col items-center justify-center space-y-2">
               <Compass className="h-10 w-10 text-slate-600 mb-1" />
-              <p className="text-xs font-bold text-white">Select a pin on the map</p>
+              <p className="text-xs font-bold text-white">Select a property pin</p>
               <p className="text-[11px] text-slate-500 max-w-xs">
-                Click any price marker pin on the map to preview property details and schedule tours.
+                Click any property button on Google Maps to preview details and schedule tours.
               </p>
             </div>
           )}

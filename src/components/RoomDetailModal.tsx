@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   X, MapPin, ShieldCheck, Heart, Calendar, Clock, DollarSign, 
   Wifi, Zap, Droplets, Car, Wind, Utensils, Lock, Sparkles, 
-  CheckCircle, MessageSquare, AlertCircle, Share2
+  CheckCircle, MessageSquare, AlertCircle, Share2, Navigation
 } from 'lucide-react';
 import { Room } from '../types';
 
@@ -218,6 +218,35 @@ export const RoomDetailModal: React.FC<RoomDetailModalProps> = ({
                   </div>
                 </div>
               )}
+
+              {/* Google Maps Property Location Section */}
+              <div className="space-y-3 pt-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <img src="https://www.google.com/favicon.ico" alt="Google Maps" className="h-4 w-4" />
+                    <h4 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Google Maps Location</h4>
+                  </div>
+                  <a
+                    href={room.lat && room.lng ? `https://www.google.com/maps/dir/?api=1&destination=${room.lat},${room.lng}` : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${room.address || room.neighborhood}, ${room.city}, Ghana`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:underline"
+                  >
+                    <Navigation className="h-3.5 w-3.5" />
+                    Get Directions on Google Maps
+                  </a>
+                </div>
+
+                <div className="relative h-48 w-full overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-md">
+                  <iframe
+                    title={`Google Maps ${room.title}`}
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(room.lat && room.lng ? `${room.lat},${room.lng}` : `${room.neighborhood}, ${room.city}, Ghana`)}&t=m&z=15&ie=UTF8&iwloc=&output=embed`}
+                    className="h-full w-full border-0 filter brightness-95 contrast-105"
+                    loading="lazy"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Right Sticky Column: Landlord Card & Action Box */}
