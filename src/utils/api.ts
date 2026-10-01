@@ -28,10 +28,17 @@ export const api = {
       const supaData = await supabaseApi.getFullData();
       if (supaData) {
         const cached = storage.getDbCache();
-        if (cached && Array.isArray(cached.users)) {
-          const supaUserEmails = new Set((supaData.users || []).map(u => u.email.toLowerCase()));
-          const localUsersToKeep = cached.users.filter(u => u && u.email && !supaUserEmails.has(u.email.toLowerCase()));
-          supaData.users = [...(supaData.users || []), ...localUsersToKeep];
+        if (cached) {
+          if (Array.isArray(cached.users)) {
+            const supaUserEmails = new Set((supaData.users || []).map(u => u.email.toLowerCase()));
+            const localUsersToKeep = cached.users.filter(u => u && u.email && !supaUserEmails.has(u.email.toLowerCase()));
+            supaData.users = [...(supaData.users || []), ...localUsersToKeep];
+          }
+          if (Array.isArray(cached.rooms)) {
+            const supaRoomIds = new Set((supaData.rooms || []).map(r => r.id));
+            const localRoomsToKeep = cached.rooms.filter(r => r && r.id && !supaRoomIds.has(r.id));
+            supaData.rooms = [...(supaData.rooms || []), ...localRoomsToKeep];
+          }
         }
         storage.setDbCache(supaData);
         return supaData;
@@ -97,35 +104,28 @@ export const api = {
       throw new Error(rls.reason || 'RLS Policy Violation');
     }
 
+    let finalRoom: Room | null = null;
+
     if (isSupabaseConfigured()) {
-      const supaRoom = await supabaseApi.createRoom(room);
-      if (supaRoom) return supaRoom;
+      finalRoom = await supabaseApi.createRoom(room);
     }
 
-    try {
-      const res = await fetch(`${API_BASE}/rooms`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(room)
-      });
-      if (res.ok) {
-        const json = await res.json();
-        return json.data;
-      }
-    } catch (e) {
-      console.warn('createRoom offline fallback', e);
+    if (!finalRoom) {
+      finalRoom = {
+        ...room,
+        id: room.id || `room-${Date.now()}`,
+        createdAt: new Date().toISOString()
+      };
     }
 
-    // Offline create
-    const newRoom: Room = {
-      ...room,
-      id: room.id || `room-${Date.now()}`,
-      createdAt: new Date().toISOString()
-    };
+    // Always push to local cache so all users on this browser/session see the new room immediately
     const db = storage.getDbCache() || { users: [], rooms: [], applications: [], conversations: [], messages: [] };
-    db.rooms.unshift(newRoom);
-    storage.setDbCache(db);
-    return newRoom;
+    if (!db.rooms.some(r => r.id === finalRoom!.id)) {
+      db.rooms.unshift(finalRoom);
+      storage.setDbCache(db);
+    }
+
+    return finalRoom;
   },
 
   async updateRoom(id: string, updates: Partial<Room>): Promise<Room> {

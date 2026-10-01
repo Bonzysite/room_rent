@@ -183,11 +183,8 @@ export const App: React.FC = () => {
   // Handlers
   const handleLoginUser = (user: User) => {
     setCurrentUser(user);
-    if (user.role === 'landlord') {
-      setCurrentTab('landlord');
-    } else {
-      setCurrentTab('tenant-hub');
-    }
+    auth.setUser(user);
+    setCurrentTab('browse');
     showToast(`Welcome back, ${user.name}! Connected as ${user.role}.`);
   };
 
