@@ -260,31 +260,60 @@ export const supabaseApi = {
     return !error;
   },
 
-  async getUserByEmail(email: string): Promise<User | null> {
+  async getUserByEmail(identifier: string): Promise<User | null> {
     if (!isSupabaseConfigured()) return null;
-    const cleanEmail = email.toLowerCase().trim();
+    const cleanInput = identifier.toLowerCase().trim();
+    const digitsOnly = identifier.replace(/[^0-9]/g, '');
+
     try {
-      const { data, error } = await supabase
+      // 1. Check email match first
+      const { data: emailData, error: emailError } = await supabase
         .from('profiles')
         .select('*')
-        .ilike('email', cleanEmail)
+        .ilike('email', cleanInput)
         .limit(1);
 
-      if (error || !data || data.length === 0) return null;
+      if (!emailError && emailData && emailData.length > 0) {
+        const profile = emailData[0];
+        return {
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          role: profile.role as any,
+          phone: profile.phone,
+          bio: profile.bio,
+          avatar: profile.avatar,
+          createdAt: profile.created_at
+        };
+      }
 
-      const profile = data[0];
-      return {
-        id: profile.id,
-        name: profile.name,
-        email: profile.email,
-        role: profile.role as any,
-        phone: profile.phone,
-        bio: profile.bio,
-        avatar: profile.avatar,
-        createdAt: profile.created_at
-      };
+      // 2. Check phone match if input contains digits
+      if (digitsOnly.length >= 6) {
+        const lastDigits = digitsOnly.slice(-9);
+        const { data: phoneData, error: phoneError } = await supabase
+          .from('profiles')
+          .select('*')
+          .ilike('phone', `%${lastDigits}%`)
+          .limit(1);
+
+        if (!phoneError && phoneData && phoneData.length > 0) {
+          const profile = phoneData[0];
+          return {
+            id: profile.id,
+            name: profile.name,
+            email: profile.email,
+            role: profile.role as any,
+            phone: profile.phone,
+            bio: profile.bio,
+            avatar: profile.avatar,
+            createdAt: profile.created_at
+          };
+        }
+      }
+
+      return null;
     } catch (err) {
-      console.warn('Supabase getUserByEmail failed:', err);
+      console.warn('Supabase user lookup failed:', err);
       return null;
     }
   },

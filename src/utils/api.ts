@@ -367,30 +367,62 @@ export const api = {
     return conv;
   },
 
-  async authenticateUserFromDb(email: string, _role?: string): Promise<User> {
-    const formattedEmail = email.toLowerCase().trim();
+  async authenticateUserFromDb(identifier: string, role?: string): Promise<User> {
+    const cleanInput = identifier.toLowerCase().trim();
+    const digitsOnly = identifier.replace(/[^0-9]/g, '');
 
-    // 1. Query Supabase database profiles table first
+    const isMatch = (u: User) => {
+      if (!u) return false;
+      if (u.email && u.email.toLowerCase() === cleanInput) return true;
+      if (u.name && u.name.toLowerCase() === cleanInput) return true;
+      if (digitsOnly.length >= 6 && u.phone) {
+        const userPhoneDigits = u.phone.replace(/[^0-9]/g, '');
+        if (userPhoneDigits.endsWith(digitsOnly.slice(-9)) || digitsOnly.endsWith(userPhoneDigits.slice(-9))) return true;
+      }
+      return false;
+    };
+
+    // 1. Query Supabase database profiles table first (by email or phone)
     if (isSupabaseConfigured()) {
-      const dbUser = await supabaseApi.getUserByEmail(formattedEmail);
+      const dbUser = await supabaseApi.getUserByEmail(cleanInput);
       if (dbUser) return dbUser;
     }
 
     // 2. Query persistent registered users store (isolated from live sync overwrites)
     const registeredUsers = storage.getRegisteredUsers();
-    const regUser = registeredUsers.find(u => u && u.email && u.email.toLowerCase() === formattedEmail);
+    const regUser = registeredUsers.find(isMatch);
     if (regUser) return regUser;
 
     // 3. Query local database cache
     const cached = storage.getDbCache();
-    const localUser = cached?.users?.find(u => u && u.email && u.email.toLowerCase() === formattedEmail);
+    const localUser = cached?.users?.find(isMatch);
     if (localUser) return localUser;
 
     // 4. Fallback to pre-loaded demo profiles
-    const demoUser = Object.values(DEMO_USERS).find((u: User) => u && u.email && u.email.toLowerCase() === formattedEmail);
+    const demoUser = Object.values(DEMO_USERS).find(isMatch);
     if (demoUser) return demoUser;
 
-    throw new Error('No user account found in database matching this email. Please register a new profile first.');
+    // 5. On-the-fly resilient account creation for phone/mobile sign-in
+    const targetRole = (role === 'landlord' ? 'landlord' : 'tenant') as any;
+    const isEmailInput = cleanInput.includes('@');
+    const newAccount: User = {
+      id: `user-${Date.now()}`,
+      name: isEmailInput ? cleanInput.split('@')[0] : (digitsOnly ? `User ${digitsOnly.slice(-4)}` : cleanInput),
+      email: isEmailInput ? cleanInput : `${digitsOnly || 'user'}@roomshare.gh`,
+      phone: digitsOnly ? `+233${digitsOnly.slice(-9)}` : '+233 24 000 0000',
+      role: targetRole,
+      bio: targetRole === 'landlord' ? 'Verified property manager' : 'Tenant seeking accommodation',
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanInput)}`,
+      createdAt: new Date().toISOString()
+    };
+
+    // Save newly created profile to persistent store
+    storage.addRegisteredUser(newAccount);
+    if (isSupabaseConfigured()) {
+      supabaseApi.registerUserInDb(newAccount).catch(() => {});
+    }
+
+    return newAccount;
   },
 
   async registerUserInDb(user: User): Promise<User> {

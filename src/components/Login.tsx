@@ -173,13 +173,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-                <Mail className="h-3.5 w-3.5 text-emerald-400" /> Email Address
+                <Mail className="h-3.5 w-3.5 text-emerald-400" /> Email Address or Phone Number
               </label>
               <input
-                type="email"
+                type="text"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
-                placeholder={loginRole === 'landlord' ? 'kwame.mensah@roomshare.gh' : 'emmanuel.owusu@techaccra.com'}
+                placeholder={loginRole === 'landlord' ? '024 123 4567 or kwame.mensah@roomshare.gh' : '024 123 4567 or emmanuel.owusu@techaccra.com'}
                 className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
               />
             </div>
