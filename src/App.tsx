@@ -14,6 +14,7 @@ import { Room, RoomApplication, Conversation, Message, User, UserRole, RoomStatu
 import { api } from './utils/api';
 import { auth, DEMO_USERS } from './utils/auth';
 import { storage } from './utils/storage';
+import { subscribeToRealtime } from './utils/supabase';
 
 import { 
   ShieldCheck, Zap, Droplets, Heart, Sparkles, Building2, 
@@ -107,13 +108,19 @@ export const App: React.FC = () => {
 
     syncData();
 
-    // Poll every 3 seconds so landlords & tenants see new texts instantly
+    // Live WebSockets subscription for instant real-time updates across clients
+    const unsubscribeRealtime = subscribeToRealtime(() => {
+      syncData();
+    });
+
+    // Background failover polling every 5 seconds
     const timer = setInterval(() => {
       syncData();
-    }, 3000);
+    }, 5000);
 
     return () => {
       isSubscribed = false;
+      unsubscribeRealtime();
       clearInterval(timer);
     };
   }, []);

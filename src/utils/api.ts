@@ -3,6 +3,7 @@ import { storage } from './storage';
 import { supabaseApi, isSupabaseConfigured } from './supabase';
 import { auth, DEMO_USERS } from './auth';
 import { RlsPolicy } from '../security/rls';
+import { cacheManager } from './cacheManager';
 
 const API_BASE = '/api';
 
@@ -23,40 +24,49 @@ async function safeFetchJson<T = any>(url: string, options?: RequestInit): Promi
 
 export const api = {
   async getFullData(): Promise<DatabaseSchema> {
-    // 1. Try Supabase first if configured
-    if (isSupabaseConfigured()) {
-      const supaData = await supabaseApi.getFullData();
-      if (supaData) {
-        const cached = storage.getDbCache();
-        if (cached) {
-          if (Array.isArray(cached.users)) {
-            const supaUserEmails = new Set((supaData.users || []).map(u => u.email.toLowerCase()));
-            const localUsersToKeep = cached.users.filter(u => u && u.email && !supaUserEmails.has(u.email.toLowerCase()));
-            supaData.users = [...(supaData.users || []), ...localUsersToKeep];
+    return cacheManager.deduplicate('getFullData', async () => {
+      // 1. Try Supabase first if configured
+      if (isSupabaseConfigured()) {
+        const supaData = await supabaseApi.getFullData();
+        if (supaData) {
+          const cached = storage.getDbCache();
+          if (cached) {
+            if (Array.isArray(cached.users)) {
+              const supaUserEmails = new Set((supaData.users || []).map(u => u.email.toLowerCase()));
+              const localUsersToKeep = cached.users.filter(u => u && u.email && !supaUserEmails.has(u.email.toLowerCase()));
+              supaData.users = [...(supaData.users || []), ...localUsersToKeep];
+            }
+            if (Array.isArray(cached.rooms)) {
+              const supaRoomIds = new Set((supaData.rooms || []).map(r => r.id));
+              const localRoomsToKeep = cached.rooms.filter(r => r && r.id && !supaRoomIds.has(r.id));
+              supaData.rooms = [...(supaData.rooms || []), ...localRoomsToKeep];
+            }
           }
-          if (Array.isArray(cached.rooms)) {
-            const supaRoomIds = new Set((supaData.rooms || []).map(r => r.id));
-            const localRoomsToKeep = cached.rooms.filter(r => r && r.id && !supaRoomIds.has(r.id));
-            supaData.rooms = [...(supaData.rooms || []), ...localRoomsToKeep];
-          }
+          storage.setDbCache(supaData);
+          cacheManager.indexFullData(supaData);
+          return supaData;
         }
-        storage.setDbCache(supaData);
-        return supaData;
       }
-    }
 
-    // 2. Try REST backend safely
-    const json = await safeFetchJson<{ data?: DatabaseSchema }>(`${API_BASE}/data`);
-    if (json?.data) {
-      storage.setDbCache(json.data);
-      return json.data;
-    }
+      // 2. Try REST backend safely
+      const json = await safeFetchJson<{ data?: DatabaseSchema }>(`${API_BASE}/data`);
+      if (json?.data) {
+        storage.setDbCache(json.data);
+        cacheManager.indexFullData(json.data);
+        return json.data;
+      }
 
-    const cached = storage.getDbCache();
-    if (cached) return cached;
+      const cached = storage.getDbCache();
+      if (cached) {
+        cacheManager.indexFullData(cached);
+        return cached;
+      }
 
-    // Fallback default
-    return { users: [], rooms: [], applications: [], conversations: [], messages: [] };
+      // Fallback default
+      const empty = { users: [], rooms: [], applications: [], conversations: [], messages: [] };
+      cacheManager.indexFullData(empty);
+      return empty;
+    });
   },
 
   async sync(data: Partial<DatabaseSchema>): Promise<DatabaseSchema> {

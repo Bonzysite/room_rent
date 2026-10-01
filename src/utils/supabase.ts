@@ -328,3 +328,26 @@ export const supabaseApi = {
     }
   }
 };
+
+/**
+ * Supabase Realtime WebSocket subscription for live updates across clients.
+ */
+export const subscribeToRealtime = (onDataChange: () => void): (() => void) => {
+  if (!isSupabaseConfigured()) return () => {};
+
+  try {
+    const channel = supabase
+      .channel('roomshare_live_updates')
+      .on('postgres_changes', { event: '*', schema: 'public' }, () => {
+        onDataChange();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  } catch (e) {
+    console.warn('Realtime subscription fallback:', e);
+    return () => {};
+  }
+};
