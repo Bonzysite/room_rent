@@ -37,8 +37,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         ? loginEmail.trim() 
         : (loginRole === 'landlord' ? 'kwame.mensah@roomshare.gh' : 'emmanuel.owusu@techaccra.com');
       
-      // Query database for user details before granting access
-      const user = await api.authenticateUserFromDb(emailToUse, loginRole);
+      // Query database for user details and verify password before granting access
+      const user = await api.authenticateUserFromDb(emailToUse, loginRole, loginPassword);
 
       auth.setUser(user);
       onLogin(user);

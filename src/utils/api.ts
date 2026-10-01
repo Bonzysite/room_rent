@@ -367,9 +367,10 @@ export const api = {
     return conv;
   },
 
-  async authenticateUserFromDb(identifier: string, role?: string): Promise<User> {
+  async authenticateUserFromDb(identifier: string, role?: string, password?: string): Promise<User> {
     const cleanInput = identifier.toLowerCase().trim();
     const digitsOnly = identifier.replace(/[^0-9]/g, '');
+    const cleanPassword = password ? password.trim() : '';
 
     const isMatch = (u: User) => {
       if (!u) return false;
@@ -382,25 +383,43 @@ export const api = {
       return false;
     };
 
+    let existingUser: User | null = null;
+
     // 1. Query Supabase database profiles table first (by email or phone)
     if (isSupabaseConfigured()) {
-      const dbUser = await supabaseApi.getUserByEmail(cleanInput);
-      if (dbUser) return dbUser;
+      existingUser = await supabaseApi.getUserByEmail(cleanInput);
     }
 
     // 2. Query persistent registered users store (isolated from live sync overwrites)
-    const registeredUsers = storage.getRegisteredUsers();
-    const regUser = registeredUsers.find(isMatch);
-    if (regUser) return regUser;
+    if (!existingUser) {
+      const registeredUsers = storage.getRegisteredUsers();
+      existingUser = registeredUsers.find(isMatch) || null;
+    }
 
     // 3. Query local database cache
-    const cached = storage.getDbCache();
-    const localUser = cached?.users?.find(isMatch);
-    if (localUser) return localUser;
+    if (!existingUser) {
+      const cached = storage.getDbCache();
+      existingUser = cached?.users?.find(isMatch) || null;
+    }
 
     // 4. Fallback to pre-loaded demo profiles
-    const demoUser = Object.values(DEMO_USERS).find(isMatch);
-    if (demoUser) return demoUser;
+    if (!existingUser) {
+      existingUser = Object.values(DEMO_USERS).find(isMatch) || null;
+    }
+
+    if (existingUser) {
+      // Password verification check
+      if (existingUser.password && cleanPassword) {
+        if (existingUser.password !== cleanPassword) {
+          throw new Error('Incorrect password entered. Please check your password and try again.');
+        }
+      } else if (cleanPassword) {
+        // Store password for account if not previously assigned
+        existingUser.password = cleanPassword;
+        storage.addRegisteredUser(existingUser);
+      }
+      return existingUser;
+    }
 
     // 5. On-the-fly resilient account creation for phone/mobile sign-in
     const targetRole = (role === 'landlord' ? 'landlord' : 'tenant') as any;
@@ -409,6 +428,7 @@ export const api = {
       id: `user-${Date.now()}`,
       name: isEmailInput ? cleanInput.split('@')[0] : (digitsOnly ? `User ${digitsOnly.slice(-4)}` : cleanInput),
       email: isEmailInput ? cleanInput : `${digitsOnly || 'user'}@roomshare.gh`,
+      password: cleanPassword || undefined,
       phone: digitsOnly ? `+233${digitsOnly.slice(-9)}` : '+233 24 000 0000',
       role: targetRole,
       bio: targetRole === 'landlord' ? 'Verified property manager' : 'Tenant seeking accommodation',
