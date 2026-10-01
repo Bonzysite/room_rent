@@ -152,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={onToggleTheme}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-800 bg-slate-900/80 text-amber-400 hover:border-emerald-500 hover:bg-slate-800 transition-all shadow-md"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-800 bg-slate-900/80 text-amber-400 hover:border-emerald-500 hover:bg-slate-800 transition-all shadow-md shrink-0"
             title={`Switch to ${theme === 'dark' ? 'Light Mode' : 'Dark Mode'}`}
             aria-label="Toggle theme mode"
           >
@@ -174,14 +174,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex h-9 w-9 items-center justify-center rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 hover:text-white hover:border-emerald-500 transition-all"
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 hover:text-white hover:border-emerald-500 transition-all shrink-0"
             aria-label="Toggle Mobile Navigation Menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5 text-emerald-400" /> : <Menu className="h-5 w-5 text-emerald-400" />}
           </button>
 
-          {/* User Profile Dropdown Menu */}
-          <div className="relative">
+          {/* Desktop User Profile Dropdown Menu (Hidden on mobile to avoid overflow, accessible via hamburger/bottom bar) */}
+          <div className="hidden md:block relative">
             <button
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               className="flex items-center gap-2.5 rounded-xl border border-slate-800 bg-slate-900/80 p-1.5 pr-3 hover:border-slate-700 transition-all"
@@ -248,7 +248,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Slide-Down Hamburger Navigation Drawer */}
       {mobileMenuOpen && (
         <div 
-          className="md:hidden border-t border-slate-800/80 bg-slate-950/95 p-4 space-y-3 backdrop-blur-2xl animate-in slide-in-from-top duration-200 shadow-2xl"
+          className="md:hidden border-t border-slate-800/80 bg-slate-950/98 p-4 space-y-3 backdrop-blur-2xl animate-in slide-in-from-top duration-200 shadow-2xl max-h-[82vh] overflow-y-auto touch-pan-y z-50"
           onClick={() => setMobileMenuOpen(false)}
         >
           {/* User Profile Summary Card at Top of Mobile Drawer */}
@@ -397,52 +397,52 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       )}
 
-      {/* Mobile Bottom Navigation Bar (Strictly Role Gated) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-800 bg-slate-950/95 backdrop-blur-xl px-1 py-2 flex items-center justify-around">
+      {/* Mobile Bottom Navigation Bar (Fixed 5-Column App Dock) */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-800/90 bg-slate-950/95 backdrop-blur-xl px-1 py-1.5 grid grid-cols-5 items-center justify-items-center shadow-2xl">
         <button
           onClick={() => onSelectTab('browse')}
-          className={`flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-            currentTab === 'browse' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+          className={`flex flex-col items-center gap-0.5 py-1 px-2 text-[10px] font-medium transition-colors ${
+            currentTab === 'browse' ? 'text-emerald-400 font-bold' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Compass className="h-5 w-5" />
-          Browse
+          <Compass className={`h-5 w-5 ${currentTab === 'browse' ? 'stroke-[2.5]' : ''}`} />
+          <span>Browse</span>
         </button>
 
         {!isLandlord && (
           <button
             onClick={() => onSelectTab('tenant-hub')}
-            className={`flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-              currentTab === 'tenant-hub' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+            className={`flex flex-col items-center gap-0.5 py-1 px-2 text-[10px] font-medium transition-colors ${
+              currentTab === 'tenant-hub' ? 'text-emerald-400 font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Layers className="h-5 w-5" />
-            Tenant Hub
+            <Layers className={`h-5 w-5 ${currentTab === 'tenant-hub' ? 'stroke-[2.5]' : ''}`} />
+            <span>Tenant Hub</span>
           </button>
         )}
 
         {isLandlord && (
           <button
             onClick={() => onSelectTab('landlord')}
-            className={`flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-              currentTab === 'landlord' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+            className={`flex flex-col items-center gap-0.5 py-1 px-2 text-[10px] font-medium transition-colors ${
+              currentTab === 'landlord' ? 'text-emerald-400 font-bold' : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <Shield className="h-5 w-5" />
-            Landlord
+            <Shield className={`h-5 w-5 ${currentTab === 'landlord' ? 'stroke-[2.5]' : ''}`} />
+            <span>Landlord</span>
           </button>
         )}
 
         <button
           onClick={() => onSelectTab('messages')}
-          className={`relative flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-            currentTab === 'messages' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+          className={`relative flex flex-col items-center gap-0.5 py-1 px-2 text-[10px] font-medium transition-colors ${
+            currentTab === 'messages' ? 'text-emerald-400 font-bold' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <MessageSquare className="h-5 w-5" />
-          Inbox
+          <MessageSquare className={`h-5 w-5 ${currentTab === 'messages' ? 'stroke-[2.5]' : ''}`} />
+          <span>Inbox</span>
           {unreadCount > 0 && (
-            <span className="absolute top-0 right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-slate-950">
+            <span className="absolute top-0.5 right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-slate-950">
               {unreadCount}
             </span>
           )}
@@ -450,22 +450,27 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         <button
           onClick={() => onSelectTab('saved')}
-          className={`relative flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-            currentTab === 'saved' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+          className={`relative flex flex-col items-center gap-0.5 py-1 px-2 text-[10px] font-medium transition-colors ${
+            currentTab === 'saved' ? 'text-emerald-400 font-bold' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Bookmark className="h-5 w-5" />
-          Saved
+          <Bookmark className={`h-5 w-5 ${currentTab === 'saved' ? 'stroke-[2.5]' : ''}`} />
+          <span>Saved</span>
+          {savedCount > 0 && (
+            <span className="absolute top-0.5 right-2 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-bold text-slate-950">
+              {savedCount}
+            </span>
+          )}
         </button>
 
         <button
           onClick={() => onSelectTab('profile')}
-          className={`relative flex flex-col items-center gap-1 p-1 text-[10px] font-medium ${
-            currentTab === 'profile' ? 'text-emerald-400 font-bold' : 'text-slate-400'
+          className={`relative flex flex-col items-center gap-0.5 py-1 px-2 text-[10px] font-medium transition-colors ${
+            currentTab === 'profile' ? 'text-emerald-400 font-bold' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <UserCheck className="h-5 w-5" />
-          Profile
+          <UserCheck className={`h-5 w-5 ${currentTab === 'profile' ? 'stroke-[2.5]' : ''}`} />
+          <span>Profile</span>
         </button>
       </div>
     </header>
