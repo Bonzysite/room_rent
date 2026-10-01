@@ -20,6 +20,7 @@ import {
   ShieldCheck, Zap, Droplets, Heart, Sparkles, Building2, 
   MapPin, CheckCircle2, ArrowRight, Compass 
 } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 
 export const App: React.FC = () => {
   // Global Database State
@@ -635,6 +636,9 @@ export const App: React.FC = () => {
           </div>
         </div>
       </footer>
+      
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 };
