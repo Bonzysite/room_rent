@@ -367,38 +367,28 @@ export const api = {
     return conv;
   },
 
-  async authenticateUserFromDb(email: string, role?: string): Promise<User> {
+  async authenticateUserFromDb(email: string, _role?: string): Promise<User> {
     const formattedEmail = email.toLowerCase().trim();
 
     // 1. Query Supabase database profiles table first
     if (isSupabaseConfigured()) {
       const dbUser = await supabaseApi.getUserByEmail(formattedEmail);
-      if (dbUser) {
-        if (role && dbUser.role !== role) {
-          throw new Error(`Account registered as "${dbUser.role}". Please select ${dbUser.role === 'landlord' ? 'Landlord Mode' : 'Tenant Mode'}.`);
-        }
-        return dbUser;
-      }
+      if (dbUser) return dbUser;
     }
 
-    // 2. Query local database cache
+    // 2. Query persistent registered users store (isolated from live sync overwrites)
+    const registeredUsers = storage.getRegisteredUsers();
+    const regUser = registeredUsers.find(u => u && u.email && u.email.toLowerCase() === formattedEmail);
+    if (regUser) return regUser;
+
+    // 3. Query local database cache
     const cached = storage.getDbCache();
     const localUser = cached?.users?.find(u => u && u.email && u.email.toLowerCase() === formattedEmail);
-    if (localUser) {
-      if (role && localUser.role !== role) {
-        throw new Error(`Account registered as "${localUser.role}". Please select ${localUser.role === 'landlord' ? 'Landlord Mode' : 'Tenant Mode'}.`);
-      }
-      return localUser;
-    }
+    if (localUser) return localUser;
 
-    // 3. Fallback to pre-loaded demo profiles
+    // 4. Fallback to pre-loaded demo profiles
     const demoUser = Object.values(DEMO_USERS).find((u: User) => u && u.email && u.email.toLowerCase() === formattedEmail);
-    if (demoUser) {
-      if (role && demoUser.role !== role) {
-        throw new Error(`Account registered as "${demoUser.role}". Please select ${demoUser.role === 'landlord' ? 'Landlord Mode' : 'Tenant Mode'}.`);
-      }
-      return demoUser;
-    }
+    if (demoUser) return demoUser;
 
     throw new Error('No user account found in database matching this email. Please register a new profile first.');
   },
@@ -406,12 +396,17 @@ export const api = {
   async registerUserInDb(user: User): Promise<User> {
     const formattedEmail = user.email.toLowerCase().trim();
 
-    // Check if user email already exists in Supabase or local cache
+    // Check if user email already exists in Supabase or registered store
     if (isSupabaseConfigured()) {
       const existing = await supabaseApi.getUserByEmail(formattedEmail);
       if (existing) {
         throw new Error('An account with this email address already exists in the database. Please sign in instead.');
       }
+    }
+
+    const registeredUsers = storage.getRegisteredUsers();
+    if (registeredUsers.some(u => u && u.email && u.email.toLowerCase() === formattedEmail)) {
+      throw new Error('An account with this email address already exists in the database. Please sign in instead.');
     }
 
     const db = storage.getDbCache() || { users: [], rooms: [], applications: [], conversations: [], messages: [] };
@@ -427,6 +422,9 @@ export const api = {
     }
 
     const finalUser = supaUser || user;
+
+    // Save to persistent registered users store so live updates never erase account lookups
+    storage.addRegisteredUser(finalUser);
 
     // Always push to local cache as guaranteed persistent backup
     if (!db.users.some(u => u && u.email && u.email.toLowerCase() === formattedEmail)) {

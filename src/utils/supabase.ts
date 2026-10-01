@@ -268,19 +268,20 @@ export const supabaseApi = {
         .from('profiles')
         .select('*')
         .ilike('email', cleanEmail)
-        .maybeSingle();
+        .limit(1);
 
-      if (error || !data) return null;
+      if (error || !data || data.length === 0) return null;
 
+      const profile = data[0];
       return {
-        id: data.id,
-        name: data.name,
-        email: data.email,
-        role: data.role as any,
-        phone: data.phone,
-        bio: data.bio,
-        avatar: data.avatar,
-        createdAt: data.created_at
+        id: profile.id,
+        name: profile.name,
+        email: profile.email,
+        role: profile.role as any,
+        phone: profile.phone,
+        bio: profile.bio,
+        avatar: profile.avatar,
+        createdAt: profile.created_at
       };
     } catch (err) {
       console.warn('Supabase getUserByEmail failed:', err);

@@ -4,7 +4,8 @@ const STORAGE_KEYS = {
   DB_CACHE: 'roomshare_db_cache_v1',
   AUTH_USER: 'roomshare_current_user_v1',
   FAVORITES: 'roomshare_favorite_rooms_v1',
-  THEME: 'roomshare_theme_v1'
+  THEME: 'roomshare_theme_v1',
+  REGISTERED_USERS: 'roomshare_registered_users_v1'
 };
 
 export const storage = {
@@ -76,6 +77,26 @@ export const storage = {
   setTheme(theme: 'dark' | 'light'): void {
     try {
       localStorage.setItem(STORAGE_KEYS.THEME, theme);
+    } catch {
+      // ignore
+    }
+  },
+
+  getRegisteredUsers(): User[] {
+    try {
+      const item = localStorage.getItem(STORAGE_KEYS.REGISTERED_USERS);
+      return item ? JSON.parse(item) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  addRegisteredUser(user: User): void {
+    try {
+      const existing = this.getRegisteredUsers();
+      const filtered = existing.filter(u => u && u.email && u.email.toLowerCase() !== user.email.toLowerCase());
+      filtered.push(user);
+      localStorage.setItem(STORAGE_KEYS.REGISTERED_USERS, JSON.stringify(filtered));
     } catch {
       // ignore
     }
