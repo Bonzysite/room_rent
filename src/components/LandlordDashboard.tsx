@@ -76,6 +76,26 @@ export const LandlordDashboard: React.FC<LandlordDashboardProps> = ({
   const [newRules, setNewRules] = useState<string>('No indoor smoking\nQuiet hours after 10:00 PM\nRespect shared compound cleanliness');
   const [newDescription, setNewDescription] = useState('');
   
+  // Custom location inputs entered directly by landlord
+  const [customCity, setCustomCity] = useState('');
+  const [newGhanaPostGps, setNewGhanaPostGps] = useState('');
+  const [newLat, setNewLat] = useState('');
+  const [newLng, setNewLng] = useState('');
+
+  const handleDetectCurrentGps = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setNewLat(pos.coords.latitude.toFixed(6));
+          setNewLng(pos.coords.longitude.toFixed(6));
+        },
+        (err) => {
+          setWizardError(`Location detection error: ${err.message}`);
+        }
+      );
+    }
+  };
+
   // Photos with compression metadata
   const [uploadedPhotos, setUploadedPhotos] = useState<{ url: string; originalSize: number; compressedSize: number }[]>([]);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -126,6 +146,11 @@ export const LandlordDashboard: React.FC<LandlordDashboardProps> = ({
       ? uploadedPhotos.map(p => p.url)
       : ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80'];
 
+    const cityToUse = customCity.trim() || newCity;
+    const fullAddress = newGhanaPostGps.trim()
+      ? `${newAddress || newNeighborhood} (GPS: ${newGhanaPostGps.trim()})`
+      : (newAddress || `${newNeighborhood}, ${cityToUse}`);
+
     try {
       await onCreateRoom({
         landlordId: currentUser.id,
@@ -136,22 +161,28 @@ export const LandlordDashboard: React.FC<LandlordDashboardProps> = ({
         price: Number(newPrice),
         deposit: Number(newDeposit),
         roomType: newRoomType,
-        city: newCity,
-        neighborhood: newNeighborhood,
-        address: newAddress || `${newNeighborhood}, ${newCity}`,
+        city: cityToUse,
+        neighborhood: newNeighborhood.trim() || 'Central',
+        address: fullAddress,
         images: photos,
         amenities: newAmenities,
         billsIncluded: newBillsIncluded,
         availableDate: newAvailableDate,
         minLeaseMonths: Number(newMinLease),
         rules: rulesArray,
-        status: 'active'
+        status: 'active',
+        lat: newLat.trim() ? Number(newLat) : undefined,
+        lng: newLng.trim() ? Number(newLng) : undefined
       });
 
       // Reset
       setIsWizardOpen(false);
       setWizardStep(1);
       setNewTitle('');
+      setCustomCity('');
+      setNewGhanaPostGps('');
+      setNewLat('');
+      setNewLng('');
       setUploadedPhotos([]);
     } catch (err: any) {
       setWizardError(err.message || 'Failed to create room');
@@ -542,7 +573,7 @@ export const LandlordDashboard: React.FC<LandlordDashboardProps> = ({
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-300">Room Accommodation Type</label>
                       <select
@@ -560,24 +591,38 @@ export const LandlordDashboard: React.FC<LandlordDashboardProps> = ({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-300">City in Ghana</label>
-                      <select
-                        value={newCity}
-                        onChange={(e) => setNewCity(e.target.value)}
-                        className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-500 focus:outline-none"
-                      >
-                        <option value="Accra">Accra</option>
-                        <option value="Kumasi">Kumasi</option>
-                        <option value="Takoradi">Takoradi</option>
-                        <option value="Tema">Tema</option>
-                        <option value="Cape Coast">Cape Coast</option>
-                      </select>
+                      <label className="text-xs font-bold text-slate-300">City / Major Region</label>
+                      <div className="space-y-2">
+                        <select
+                          value={newCity}
+                          onChange={(e) => { setNewCity(e.target.value); setCustomCity(''); }}
+                          className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-500 focus:outline-none"
+                        >
+                          <option value="Accra">Accra</option>
+                          <option value="Kumasi">Kumasi</option>
+                          <option value="Takoradi">Takoradi</option>
+                          <option value="Tema">Tema</option>
+                          <option value="Cape Coast">Cape Coast</option>
+                          <option value="Tamale">Tamale</option>
+                          <option value="Other">Other / Custom Town</option>
+                        </select>
+
+                        {newCity === 'Other' && (
+                          <input
+                            type="text"
+                            value={customCity}
+                            onChange={(e) => setCustomCity(e.target.value)}
+                            placeholder="Type custom Ghana town or city name"
+                            className="w-full rounded-xl border border-emerald-500/50 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-500 focus:outline-none"
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-300">Neighborhood / Suburb</label>
+                      <label className="text-xs font-bold text-slate-300">Neighborhood / Suburb *</label>
                       <input
                         type="text"
                         value={newNeighborhood}
@@ -588,7 +633,7 @@ export const LandlordDashboard: React.FC<LandlordDashboardProps> = ({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-300">Street / Landmark Address</label>
+                      <label className="text-xs font-bold text-slate-300">Street & Landmark Address</label>
                       <input
                         type="text"
                         value={newAddress}
@@ -596,6 +641,60 @@ export const LandlordDashboard: React.FC<LandlordDashboardProps> = ({
                         placeholder="e.g. Near American House, Boundary Road"
                         className="w-full rounded-xl border border-slate-700 bg-slate-950 p-2.5 text-xs text-white focus:border-emerald-500 focus:outline-none"
                       />
+                    </div>
+                  </div>
+
+                  {/* Digital GhanaPost GPS & Pin Coordinates Box */}
+                  <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="h-4 w-4 text-emerald-400" />
+                        <span className="text-xs font-bold text-white">Digital Address & Map Coordinates</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleDetectCurrentGps}
+                        className="flex items-center gap-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold text-emerald-400 hover:bg-emerald-500/20 transition-all"
+                      >
+                        <MapPin className="h-3 w-3" />
+                        Auto-Detect My GPS
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] text-slate-400 block font-semibold">GhanaPost Digital Address</label>
+                        <input
+                          type="text"
+                          value={newGhanaPostGps}
+                          onChange={(e) => setNewGhanaPostGps(e.target.value)}
+                          placeholder="e.g. GA-183-9020"
+                          className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-xs text-white focus:border-emerald-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] text-slate-400 block font-semibold">Latitude Pin (Optional)</label>
+                        <input
+                          type="text"
+                          value={newLat}
+                          onChange={(e) => setNewLat(e.target.value)}
+                          placeholder="e.g. 5.6358"
+                          className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-xs text-white focus:border-emerald-500 focus:outline-none"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] text-slate-400 block font-semibold">Longitude Pin (Optional)</label>
+                        <input
+                          type="text"
+                          value={newLng}
+                          onChange={(e) => setNewLng(e.target.value)}
+                          placeholder="e.g. -0.1601"
+                          className="w-full rounded-xl border border-slate-700 bg-slate-900 p-2 text-xs text-white focus:border-emerald-500 focus:outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
