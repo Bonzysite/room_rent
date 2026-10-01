@@ -1,0 +1,7 @@
+# Normalize line endings for all text files across Windows, Linux, and Vercel
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.webp binary
