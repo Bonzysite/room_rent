@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Compass, PlusCircle, Bookmark, MessageSquare, UserCheck, Shield, ChevronDown, Layers, LogOut, Sun, Moon, Menu, X } from 'lucide-react';
+import { Home, Compass, PlusCircle, Bookmark, MessageSquare, UserCheck, Shield, ChevronDown, Layers, LogOut, Sun, Moon, Menu, X, Bell } from 'lucide-react';
 import { User } from '../types';
 
 interface NavbarProps {
@@ -148,6 +148,22 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right CTA, Theme Toggle & Hamburger Button */}
         <div className="flex items-center gap-2 sm:gap-3">
           
+          {/* Notification Bell Button */}
+          <button
+            type="button"
+            onClick={() => onSelectTab('messages')}
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 hover:text-emerald-400 hover:border-emerald-500 hover:bg-slate-800 transition-all shadow-md shrink-0"
+            title="Notifications & Messages"
+            aria-label="Notifications"
+          >
+            <Bell className="h-4 w-4" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-extrabold text-slate-950 animate-pulse ring-2 ring-slate-950">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
           {/* Dark / Light Mode Toggle Button */}
           <button
             type="button"
