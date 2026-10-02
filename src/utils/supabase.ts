@@ -118,7 +118,7 @@ export const supabaseApi = {
     const id = room.id || `room-${Date.now()}`;
     const createdAt = new Date().toISOString();
 
-    const { data, error } = await supabase.from('rooms').insert([{
+    const insertObj: any = {
       id,
       landlord_id: room.landlordId,
       landlord_name: room.landlordName,
@@ -131,43 +131,67 @@ export const supabaseApi = {
       city: room.city,
       neighborhood: room.neighborhood,
       address: room.address,
-      images: room.images,
-      amenities: room.amenities,
+      images: room.images || [],
+      amenities: room.amenities || [],
       bills_included: room.billsIncluded,
       available_date: room.availableDate,
       min_lease_months: room.minLeaseMonths,
-      rules: room.rules,
-      status: room.status,
+      rules: room.rules || [],
+      status: room.status || 'active',
       created_at: createdAt
-    }]).select().single();
+    };
 
-    if (error || !data) {
-      console.error('Supabase createRoom error:', error);
+    if (room.landlordPhone) insertObj.landlord_phone = room.landlordPhone;
+    if (room.lat) insertObj.lat = Number(room.lat);
+    if (room.lng) insertObj.lng = Number(room.lng);
+
+    try {
+      let { data, error } = await supabase.from('rooms').upsert([insertObj], { onConflict: 'id' }).select().single();
+
+      if (error) {
+        // Fallback retry without optional lat/lng/phone columns if schema mismatch
+        delete insertObj.landlord_phone;
+        delete insertObj.lat;
+        delete insertObj.lng;
+        const retry = await supabase.from('rooms').upsert([insertObj], { onConflict: 'id' }).select().single();
+        data = retry.data;
+        error = retry.error;
+      }
+
+      if (error || !data) {
+        console.error('Supabase createRoom error:', error);
+        return null;
+      }
+
+      return {
+        id: data.id,
+        landlordId: data.landlord_id,
+        landlordName: data.landlord_name,
+        landlordEmail: data.landlord_email,
+        landlordPhone: data.landlord_phone || room.landlordPhone,
+        title: data.title,
+        description: data.description,
+        price: Number(data.price),
+        deposit: Number(data.deposit),
+        roomType: data.room_type,
+        city: data.city,
+        neighborhood: data.neighborhood,
+        address: data.address,
+        images: data.images || [],
+        amenities: data.amenities || [],
+        billsIncluded: Boolean(data.bills_included),
+        availableDate: data.available_date,
+        minLeaseMonths: Number(data.min_lease_months),
+        rules: data.rules || [],
+        status: data.status,
+        lat: data.lat ? Number(data.lat) : room.lat,
+        lng: data.lng ? Number(data.lng) : room.lng,
+        createdAt: data.created_at
+      };
+    } catch (err) {
+      console.error('Supabase createRoom exception:', err);
       return null;
     }
-
-    return {
-      id: data.id,
-      landlordId: data.landlord_id,
-      landlordName: data.landlord_name,
-      landlordEmail: data.landlord_email,
-      title: data.title,
-      description: data.description,
-      price: Number(data.price),
-      deposit: Number(data.deposit),
-      roomType: data.room_type,
-      city: data.city,
-      neighborhood: data.neighborhood,
-      address: data.address,
-      images: data.images,
-      amenities: data.amenities,
-      billsIncluded: Boolean(data.bills_included),
-      availableDate: data.available_date,
-      minLeaseMonths: Number(data.min_lease_months),
-      rules: data.rules,
-      status: data.status,
-      createdAt: data.created_at
-    };
   },
 
   async upsertUser(user: User): Promise<boolean> {

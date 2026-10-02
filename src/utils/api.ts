@@ -41,6 +41,13 @@ export const api = {
               const localRoomsToKeep = cached.rooms.filter(r => r && r.id && !supaRoomIds.has(r.id));
               supaData.rooms = [...(supaData.rooms || []), ...localRoomsToKeep];
             }
+
+            const regRooms = storage.getRegisteredRooms();
+            if (regRooms.length > 0) {
+              const supaRoomIds = new Set((supaData.rooms || []).map(r => r.id));
+              const localRegRoomsToKeep = regRooms.filter(r => r && r.id && !supaRoomIds.has(r.id));
+              supaData.rooms = [...localRegRoomsToKeep, ...(supaData.rooms || [])];
+            }
           }
           storage.setDbCache(supaData);
           cacheManager.indexFullData(supaData);
@@ -128,7 +135,8 @@ export const api = {
       };
     }
 
-    // Always push to local cache so all users on this browser/session see the new room immediately
+    // Always save to persistent registered rooms store and local cache
+    storage.addRegisteredRoom(finalRoom);
     const db = storage.getDbCache() || { users: [], rooms: [], applications: [], conversations: [], messages: [] };
     if (!db.rooms.some(r => r.id === finalRoom!.id)) {
       db.rooms.unshift(finalRoom);

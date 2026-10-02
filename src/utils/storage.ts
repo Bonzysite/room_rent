@@ -5,7 +5,8 @@ const STORAGE_KEYS = {
   AUTH_USER: 'roomshare_current_user_v1',
   FAVORITES: 'roomshare_favorite_rooms_v1',
   THEME: 'roomshare_theme_v1',
-  REGISTERED_USERS: 'roomshare_registered_users_v1'
+  REGISTERED_USERS: 'roomshare_registered_users_v1',
+  REGISTERED_ROOMS: 'roomshare_registered_rooms_v1'
 };
 
 export const storage = {
@@ -97,6 +98,26 @@ export const storage = {
       const filtered = existing.filter(u => u && u.email && u.email.toLowerCase() !== user.email.toLowerCase());
       filtered.push(user);
       localStorage.setItem(STORAGE_KEYS.REGISTERED_USERS, JSON.stringify(filtered));
+    } catch {
+      // ignore
+    }
+  },
+
+  getRegisteredRooms(): Room[] {
+    try {
+      const item = localStorage.getItem(STORAGE_KEYS.REGISTERED_ROOMS);
+      return item ? JSON.parse(item) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  addRegisteredRoom(room: Room): void {
+    try {
+      const existing = this.getRegisteredRooms();
+      const filtered = existing.filter(r => r && r.id !== room.id);
+      filtered.unshift(room);
+      localStorage.setItem(STORAGE_KEYS.REGISTERED_ROOMS, JSON.stringify(filtered));
     } catch {
       // ignore
     }
